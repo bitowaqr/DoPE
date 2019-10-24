@@ -31,26 +31,23 @@ names(lsoa_pop) = c("code","total_pop")
 
 # LSOA IMD score
 lsoa_imd = read.csv("./raw_data/IoD2019_Scores.csv", stringsAsFactors = F)
-str(lsoa_imd)
 lsoa_imd = lsoa_imd[,-c(2:4,13:20)]
 names(lsoa_imd)[1] = "code"
 
 
 # ethnicity
 lsoa_ethnicity = read.csv("raw_data/LSOA_Ethnicity.csv",stringsAsFactors = F)
-
 lsoa_ethnicity = lsoa_ethnicity[,3:5]
 lsoa_ethnicity = data.frame(code = lsoa_ethnicity$geography.code,
                             perc_white = lsoa_ethnicity$Sex..All.persons..Age..All.categories..Age..Ethnic.Group..White..Total..measures..Value/lsoa_ethnicity$Sex..All.persons..Age..All.categories..Age..Ethnic.Group..All.categories..Ethnic.group..measures..Value)
-                            
+lsoa_ethnicity = lsoa_ethnicity[!(grepl("W",lsoa_ethnicity$code)),]                            
 # density?
 
 # merge everything
 lsoa_df = Reduce(function(x, y) merge(x, y,by="code", all=TRUE), list(lsoa_participation,lsoa_distance, lsoa_imd, lsoa_pop,lsoa_ethnicity))
-
+lsoa_df$run_count[is.na(lsoa_df$run_count)] = 0
 # observation period 1 Jan 2018-10 Dec 2018
 obs_period = 49 # weeks
 
 
 write.csv(lsoa_df,"./output/lsoa_df.csv",row.names = F)
-
