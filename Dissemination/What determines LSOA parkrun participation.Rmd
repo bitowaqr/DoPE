@@ -21,22 +21,33 @@ knitr::opts_knit$set(root.dir = 'C:/Users/Robert/Google Drive/Other Projects/PAR
 library(reshape2)
 library(dplyr)
 library(ggplot2)
+library("viridis")
 
-# read in da
+# read in data & tidy
 df <- read.csv("output/lsoa_df.csv")%>% 
-        mutate(run_rate = run_count/total_pop) %>%
-        mutate(imd_quint = cut(x = imd,breaks = quantile(imd,s(c(.25,.50,.75)),
+  
+        mutate(run_rate = run_count/total_pop,
+               imd_quint = cut(x = imd,
+                               breaks = quantile(imd,seq(0,1,0.1)),
                                ordered_result = T,
                                labels = F),
-               bme_quint= cut(x = perc_bme,breaks = quantile(perc_bme),ordered_result = T,labels = F))%>%
+               bme_quint= cut(x = perc_bme,
+                              breaks = quantile(perc_bme,seq(0,1,0.1)),
+                              ordered_result = T,
+                              labels = F))%>%
+                 
         melt(id.vars = c("code","imd_quint","bme_quint"),
-           measure.vars ="run_rate", 
-           value.name = "value")
+             measure.vars ="run_rate", 
+             value.name = "run_rate") %>%
+  
+        select(imd_quint,bme_quint,run_rate)
+
+df <- aggregate(run_rate ~ imd_quint + bme_quint, data = df, FUN= "mean" )
 
 ggplot(data = df,
-       aes(imd_quint, bme_quint, fill= value)) + 
-  geom_tile()
-
+       aes(imd_quint, bme_quint, fill= run_rate)) + 
+  geom_tile()+
+  scale_fill_viridis(discrete=FALSE)
 ```
 
 ## Including Plots
