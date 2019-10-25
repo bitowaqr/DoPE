@@ -13,17 +13,21 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE, 
                       tidy = TRUE)
 knitr::opts_knit$set(root.dir = 'C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE')
+
+
 ```
 
 ## R Markdown
 
 ```{r}
+
+rm(list = ls())
 library(reshape2)
 library(dplyr)
 library(ggplot2)
 library("viridis")
 
-# read in data & tidy
+# RUN RATE
 df <- read.csv("output/lsoa_df.csv")%>% 
   
         mutate(run_rate = run_count/total_pop,
@@ -48,6 +52,38 @@ ggplot(data = df,
        aes(imd_quint, bme_quint, fill= run_rate)) + 
   geom_tile()+
   scale_fill_viridis(discrete=FALSE)
+
+# ACCESS
+
+df <- read.csv("output/lsoa_df.csv")%>% 
+  
+        mutate(run_rate = run_count/total_pop,
+               imd_quint = cut(x = imd,
+                               breaks = quantile(imd,seq(0,1,0.1)),
+                               ordered_result = T,
+                               labels = F),
+               bme_quint= cut(x = perc_bme,
+                              breaks = quantile(perc_bme,seq(0,1,0.1)),
+                              ordered_result = T,
+                              labels = F))%>%
+                 
+        melt(id.vars = c("code","imd_quint","bme_quint"),
+             measure.vars ="mn_dstn", 
+             value.name = "mn_dstn") %>%
+  
+        select(imd_quint,bme_quint,mn_dstn)
+
+df <- aggregate(mn_dstn ~ imd_quint + bme_quint, data = df, FUN= "mean" )
+
+ggplot(data = df,
+       aes(imd_quint, bme_quint, fill= mn_dstn)) + 
+  geom_tile()+
+  scale_fill_viridis(discrete=FALSE)
+
+
+
+
+
 ```
 
 ## Including Plots
