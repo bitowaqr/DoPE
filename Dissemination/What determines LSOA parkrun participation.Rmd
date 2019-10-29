@@ -1,9 +1,26 @@
 ---
-title: "What determines LSOA parkrun participation"
-author: "Robert Smith & Paul Schneider"
-date: "24 October 2019"
 output: pdf_document
+editor_options: 
+  chunk_output_type: console
 ---
+
+# What determines community level parkrun participation? 
+
+*Smith R^1^,Schneider PP^1^*
+
+\begingroup\small
+*^1^ScHARR* 
+\endgroup
+
+<br>
+
+  __Keywords__:  `parkrun`, `Participation`, `Physical Activity`, `Equity`, `Ethnicity`.  
+  
+  __Intended Journal__:.
+
+
+****  
+
 
 ```{r setup, include=FALSE, echo=FALSE}
 knitr::opts_chunk$set(echo = FALSE, 
@@ -16,83 +33,258 @@ knitr::opts_knit$set(root.dir = 'C:/Users/Robert/Google Drive/Other Projects/PAR
 
 
 ```
+# Abstract
+
+There is substantial hetrogeneity in parkrun participation across different communities in England. Previous anaysis has shown that communities that live further from the nearest parkrun, and communities in deprived areas have lower participation rates (Schneider et al. 2019).
+
+This paper is the first to make use of data at the LSOA level, provided by parkrun and available through the ONS, to investigate the determinants of parkrun participation.
+
+We find that deprivation, distance to nearest event and ethnicity are strong predictors of parkrun participation rates. This creates an opportunity for parkrun to increase participation through engagement with these communities.
 
 # Introduction
 
+There is strong evidence from survey data that ethnic minority individuals in England are less likely to be physcially active, and to engage in sport in general [Sport England](https://www.sportengland.org/media/3513/sports-participation-and-ethnicity-in-england-headline-findings.pdf). 
 
-```{r}
 
-rm(list = ls())
+# Methods
+
+Data from parkrun website (event locations), parkrun (participation), Office of National Statistics.
+
+Merged datasets.
+
+Simple correlations and poisson regression.
+By combining data provided by parkrun on the location of events and the number of participants from each LSAO in England over a 12 month period with characteristics on each LSOA from ONS data (INSERT LINK) including population density, Index of Multiple Deprivation scores and ethnic make-up it was possible to answer questions at the community level.  
+
+
+
+# Results
+
+There is a negative correlation between particpation (run_count) and deprivation (imd), distance to nearest parkrun (mn_distance), population density (pop_density) and percent BME (perc_bme). Percent BME was strongly postively correlated with population density, negatively correlated with percent non-working age, and moderately positvely correlated with IMD  suggesting that areas with more BME residents are more densely populated, more deprived and have fewer older people.
+
+## Correlation Matrix
+
+```{r, echo = F,fig.height=8, fig.width=8}
 library(reshape2)
 library(dplyr)
 library(ggplot2)
 library("viridis")
+#install.packages("corrplot")
+library(corrplot)
+library(ggplot2)
 
+rm(list = ls())
+
+setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE')
+
+## CORRELATION MATRIX IMD ONLY
+c(1,5:11)
+cor_mat <-  read.csv("output/lsoa_df.csv") %>%
+              select(-c(1,5:11)) %>%
+              cor
+      
+rownames(cor_mat) <-  colnames(cor_mat) <- substr(colnames(cor_mat),1,20)
+
+corrplot(corr = cor_mat,
+         addCoef.col = "black",
+         type = "upper",
+         title = "Correlation of Variables")
+
+```
+
+## Colour plot
+
+We are interested in particular in how participation in parkrun varies by the percent BME and IMD of the community. We split our LSOA into deciles based on the two variables and represent the mean participation rate for LSOAs which fall into the repsective deciles (e.g. 2,5 means decile 2 for BME and 5 for IMD) as a colour on the plot. 
+
+The plot shows that participation is lowest in areas with the highest deprivation, and that there is a complex relationship between ethnicity and participation, with higher participation in areas with moderately high percentage BME. 
+
+```{r, echo=F,fig.height=8, fig.width=8}
 # RUN RATE
-df <- read.csv("output/lsoa_df.csv")%>% 
+df <- read.csv("output/lsoa_df.csv") %>% 
   
         mutate(run_rate = run_count/total_pop,
-               imd_quint = cut(x = imd,
+               imd_dec = cut(x = imd,
                                breaks = quantile(imd,seq(0,1,0.1)),
-                               ordered_result = T,
-                               labels = F),
-               bme_quint= cut(x = perc_bme,
-                              breaks = quantile(perc_bme,seq(0,1,0.1)),
+         ordered_result = T,
+         labels = F),
+         bme_dec= cut(x = perc_bme,
+                      breaks = quantile(perc_bme,seq(0,1,0.1)),
                               ordered_result = T,
                               labels = F))%>%
                  
-        melt(id.vars = c("code","imd_quint","bme_quint"),
+        melt(id.vars = c("code","imd_dec","bme_dec"),
              measure.vars ="run_rate", 
              value.name = "run_rate") %>%
   
-        select(imd_quint,bme_quint,run_rate)
+        select(imd_dec,bme_dec,run_rate)
 
-df <- aggregate(run_rate ~ imd_quint + bme_quint, data = df, FUN= "mean" )
+df <- aggregate(run_rate ~ bme_dec + imd_dec, 
+                data = df, 
+                FUN= "mean")
 
 ggplot(data = df,
-       aes(imd_quint, bme_quint, fill= run_rate)) + 
+       aes(bme_dec, imd_dec, fill= run_rate)) + 
   geom_tile()+
   scale_fill_viridis(discrete=FALSE)
 
 # ACCESS
+#
+#df <- read.csv("output/lsoa_df.csv")%>% 
+#  
+#        mutate(run_rate = run_count/total_pop,
+#               imd_quint = cut(x = imd,
+#                               breaks = #quantile(imd,seq(0,1,0.1)),
+#                               ordered_result = T,
+#                               labels = F),
+#               bme_quint= cut(x = perc_bme,
+#                              breaks = #quantile(perc_bme,seq(0,1,0.1)),
+#                              ordered_result = T,
+#                              labels = F))%>%
+#                 
+#        melt(id.vars = c("code","imd_quint","bme_quint"),
+#             measure.vars ="mn_dstn", 
+#             value.name = "mn_dstn") %>%
+#  
+#        select(imd_quint,bme_quint,mn_dstn)
+#
+#df <- aggregate(mn_dstn ~ imd_quint + bme_quint, data = df, #FUN= "mean" )
+#
+#ggplot(data = df,
+#       aes(imd_quint, bme_quint, fill= mn_dstn)) + 
+#  geom_tile()+
+#  scale_fill_viridis(discrete=FALSE)
 
-df <- read.csv("output/lsoa_df.csv")%>% 
+```
+
+In order to control for confounders, we created a partial correlation matrix. This estimates the correlation between the variables in the analysis holding all other variables constant.
+
+Looking at the top row, it is clear that participation rates and deprivation is strongly correlated, but less so now we are controlling for other variables. Distance is also strongly correlated, as our previous analysis published in XXX showed. The percent BME is also negatively correlated, suggesting that some of the relationship between participation and IMD is attributable to the ethnicity of residents.
+
+## Partial correlation matrix
+```{r echo=FALSE, fig.height=8, fig.width=8}
+library(psych)
+
+df <- read.csv("output/lsoa_df.csv") %>% 
   
-        mutate(run_rate = run_count/total_pop,
-               imd_quint = cut(x = imd,
-                               breaks = quantile(imd,seq(0,1,0.1)),
-                               ordered_result = T,
-                               labels = F),
-               bme_quint= cut(x = perc_bme,
-                              breaks = quantile(perc_bme,seq(0,1,0.1)),
-                              ordered_result = T,
-                              labels = F))%>%
-                 
-        melt(id.vars = c("code","imd_quint","bme_quint"),
-             measure.vars ="mn_dstn", 
-             value.name = "mn_dstn") %>%
-  
-        select(imd_quint,bme_quint,mn_dstn)
+        mutate(run_rate = run_count/total_pop) %>%
 
-df <- aggregate(mn_dstn ~ imd_quint + bme_quint, data = df, FUN= "mean" )
+        select(run_rate,imd,perc_bme,
+               mn_dstn,pop_density,
+               perc_non_working_age)
 
-ggplot(data = df,
-       aes(imd_quint, bme_quint, fill= mn_dstn)) + 
-  geom_tile()+
-  scale_fill_viridis(discrete=FALSE)
+# partial correlation plot for all variables
+partial.r(data = df) %>%
+      corrplot(addCoef.col = "black",
+                     type = "upper",
+                     title = "Correlation of Variables")
+ 
 
-
-
+     
+# partial correlation plot for three key variables holding others constant.
+#include <- c("run_rate","perc_bme","imd")
+#constant <- c("pop_density","perc_non_working_age","mn_dstn")
+#
+#partial.r(data = df,
+#          x = include,
+#          y = constant) %>%
+#      corrplot(addCoef.col = "black",
+#               type = "upper",
+#               title = "Correlation of Variables")
 
 
 ```
 
-## Including Plots
+## Poissson Model
 
+Poisson models are commonly used to estimate count data, where values are constrained by 0. In this case, because it is not possible for a community to have negative participation we use a Poisson regression.
 
+The results of the poisson regression are not notoriously easy to interpret, but show that areas with a higher percent of residents who are non-White-British have lower participation rates, even when controlling for the effect of deprivation and distance to events. The effect is smaller than deprivation and distance, but still sizeable and significant. 
 
-```{r }
+```{r, echo = FALSE}
+rm(list = ls())
+
+df <- read.csv("output/lsoa_df.csv")
+
+#===
+# Model 1: Poisson model imd all as one.
+#===
+
+model1 = glm(run_count ~ imd + pop_density + mn_dstn 
+                         + perc_non_working_age + perc_bme,
+             data = df,
+             family = poisson(link="log"),
+             offset = log(total_pop))
+
+#summary(model1)
+
+x = summary(model1)
+
+#1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
+
+#===
+# MODEL 2 - SCALED DATA
+#===  
+
+# scale the dataframe
+scaled_df <- data.frame(code = df$code,
+                        run_count = df$run_count,
+                        scale(df[,-c(1,2,12)]),
+                        total_pop =df$total_pop,
+                        stringsAsFactors = F)
+
+# model 2
+model2 <- glm(run_count ~ imd + mn_dstn + 
+                perc_non_working_age + log(pop_density) + perc_bme,
+             data = scaled_df,
+             family = poisson(link="log"),
+             offset = log(total_pop))
+
+#summary(model2)
+
+x <- summary(model2)
+
+#1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
+
+#===
+# MODEL 3
+#===
+
+model3 <-  glm(run_count ~ imd * perc_bme + mn_dstn,
+             data = scaled_df,
+             family = poisson(link="log"),
+             offset = log(total_pop))
+
+#summary(model3)
+
+x = summary(model3)
+
+#1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
+  
+#===
+# MODEL 4 - JUST IMD IMD, DISTANCE AND %BME
+#===
+model4 <- glm(run_count ~ imd + mn_dstn + perc_bme,
+             data = scaled_df,
+             family = poisson(link="log"),
+             offset = log(total_pop))
+
+summary(model4)
+
+x = summary(model4)
+
+1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
+
 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+    
+# Discussion
+
+Previous analysis has shown that participation in physical activity generally, and parkrun in particular, is lower in deprived communities. 
+
+This paper has investigated the relationship between participation, distance and deprivation. Our findings show that some of the negative effect of deprivation on participation can actually be attributed to differences in participation by ethnicity.
+
+We find that communities with higher percentages of ethnic minority residents were less likely to participate in parkrun, even when controlling for deprivation. Since percentage ethnic minoroties and deprivation are positively correlated, it is likely that some of the effect attributed to deprivation in previous analysis (Schneider et al. 2019) is in part attributable to ethnicity. In short, the socioeconomic gradient in parkrun participation is shallower than perviously thought, but the ethnic gradient revealed.
+
+That communities with a higher percentage of ethnic minority residents have lower participation rates in parkrun may not be a public health problem in and of itself. Different communities may freely choose to take part in different types of physical activity for many reasons. But given physical actiivty levels in these commuities are also lower, it seems there is an opportunity for parkrun to develop methods of reaching groups who have low rates of engagement, with huge public health potential.
+
+# References
