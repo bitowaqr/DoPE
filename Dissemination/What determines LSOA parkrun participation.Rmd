@@ -45,6 +45,14 @@ We find that deprivation, distance to nearest event and ethnicity are strong pre
 
 There is strong evidence from survey data that ethnic minority individuals in England are less likely to be physcially active, and to engage in sport in general [Sport England](https://www.sportengland.org/media/3513/sports-participation-and-ethnicity-in-england-headline-findings.pdf). 
 
+Previous analysis has been conducted investigating the factors associated with higher levels of partcipation [Cleland et al., 2019](https://journals.sagepub.com/doi/pdf/10.1177/0890117118770106?casa_token=WIfzcbwmyFoAAAAA:v2iYFcITA7-__9Xn3pZvS9GRw-aIvKkDGLU1bU6__behSpsm__LwcvkTGclu79R42FECROneYL5N). However, due to the biases associated with surveying only parkrun participants the findings have no external validity (i.e. estimating the relationship between education and number of runs once engaged with parkrun does not tell us about engagement with parkrun). The authors themselves note the limitation that "The sample was limited to a nonrandom sample of parkrun participants in one State of Australia and may not be generalizable to other parkrun populations." (p.21).
+
+
+
+
+
+
+
 
 # Methods
 
@@ -53,15 +61,14 @@ Data from parkrun website (event locations), parkrun (participation), Office of 
 Merged datasets.
 
 Simple correlations and poisson regression.
-By combining data provided by parkrun on the location of events and the number of participants from each LSAO in England over a 12 month period with characteristics on each LSOA from ONS data (INSERT LINK) including population density, Index of Multiple Deprivation scores and ethnic make-up it was possible to answer questions at the community level.  
+By combining data provided by parkrun on the location of events and the number of participants from each LSAO in England over a 12 month period with characteristics on each LSOA from ONS data (INSERT LINK) including population density, Index of Multiple Deprivation scores and ethnic make-up it was possible to answer questions at the community level. 
+
+32844 LSOAs with 
 
 
 
 # Results
-
-There is a negative correlation between particpation (run_count) and deprivation (imd), distance to nearest parkrun (mn_distance), population density (pop_density) and percent BME (perc_bme). Percent BME was strongly postively correlated with population density, negatively correlated with percent non-working age, and moderately positvely correlated with IMD  suggesting that areas with more BME residents are more densely populated, more deprived and have fewer older people.
-
-## Correlation Matrix
+Participation in parkrun varies between LSOA.
 
 ```{r, echo = F,fig.height=8, fig.width=8}
 library(reshape2)
@@ -73,6 +80,23 @@ library(corrplot)
 library(ggplot2)
 
 rm(list = ls())
+
+setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE')
+
+df <- read.csv("output/lsoa_df.csv") %>% 
+        mutate(run_rate = run_count/total_pop)
+
+hist(df$run_rate)
+
+
+```
+
+There is a negative correlation between particpation (run_count) and deprivation (imd), distance to nearest parkrun (mn_distance), population density (pop_density) and percent BME (perc_bme). Percent BME was strongly postively correlated with population density, negatively correlated with percent non-working age, and moderately positvely correlated with IMD  suggesting that areas with more BME residents are more densely populated, more deprived and have fewer older people.
+
+## Correlation Matrix
+
+```{r, echo = F,fig.height=8, fig.width=8}
+
 
 setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE')
 
