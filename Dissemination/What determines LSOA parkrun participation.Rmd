@@ -137,7 +137,7 @@ corrplot(corr = cor_mat,
 
 
 ## Association plot
-```{r, echo = F,fig.height=3, fig.width=5}
+```{r, echo = F,fig.height=5, fig.width=8}
 
 df <-  read.csv("../output/lsoa_df.csv") %>%
               dplyr::select(run_count,imd, perc_bme, mn_dstn,
@@ -156,27 +156,42 @@ df <-  read.csv("../output/lsoa_df.csv") %>%
 
 
 ## Association plot
+# ggplot(df) +
+#   geom_point(aes(x=perc_bme*100,y=run_count),col="purple",alpha=0.3,size=0.5) +
+#   geom_smooth(aes(x=perc_bme*100,y=run_count)) +
+#   labs(y="Average weekly runs per 1000 people", x = "% ethnic minorities") +
+#   ylim(c(0,750)) +  # outliers excluded
+#   theme_minimal()
+# 
+# 
+# ggplot(df) +
+#   geom_point(aes(x=perc_bme*100,y=imd),col="darkorange",alpha=0.3,size=0.5) +
+#   geom_smooth(aes(x=perc_bme*100,y=imd)) +
+#   labs(y="IMD score", x = "% ethnic minorities") +
+#   theme_minimal()
+# 
+# 
+# ggplot(df) +
+#   geom_point(aes(x=imd,y=run_count),col="cyan",alpha=0.4,size=0.5) +
+#   geom_smooth(aes(x=perc_bme*100,y=run_count)) +
+#   labs(y="Average weekly runs per 1000 people", x = "IMD") +
+#   ylim(c(0,750)) +  # outliers excluded
+#   theme_minimal()
+
+
+# joint smooth association plot
+
+bme_5 = cut(df$perc_bme,breaks = quantile(df$perc_bme,probs=seq(0,1,by=0.2)),include.lowest = T)
+
 ggplot(df) +
-  geom_point(aes(x=perc_bme*100,y=run_count),col="purple",alpha=0.3,size=0.5) +
-  geom_smooth(aes(x=perc_bme*100,y=run_count)) +
-  labs(y="Average weekly runs per 1000 people", x = "% ethnic minorities") +
-  ylim(c(0,750)) +  # outliers excluded
-  theme_minimal()
+  geom_point(aes(x=imd,y=run_count),col="darkgray",alpha=.3,size=.5) +
+  geom_smooth(aes(x=imd,y=run_count,col=bme_5)) +
+  xlab("Multiple deprivation") +
+  ylim(c(0,500)) +
+  ylab("Average weekly runs per 1000 people") +
+  theme_minimal() +
+  scale_color_manual(values= c(2,3,4,5,6),name="% bme quintiles",labels=c("Lowest","low","median","high","highest"))
 
-
-ggplot(df) +
-  geom_point(aes(x=perc_bme*100,y=imd),col="darkorange",alpha=0.3,size=0.5) +
-  geom_smooth(aes(x=perc_bme*100,y=imd)) +
-  labs(y="IMD score", x = "% ethnic minorities") +
-  theme_minimal()
-
-
-ggplot(df) +
-  geom_point(aes(x=imd,y=run_count),col="cyan",alpha=0.4,size=0.5) +
-  geom_smooth(aes(x=perc_bme*100,y=run_count)) +
-  labs(y="Average weekly runs per 1000 people", x = "IMD") +
-  ylim(c(0,750)) +  # outliers excluded
-  theme_minimal()
 ```
 
 
