@@ -79,5 +79,5 @@ ggplot(lsoa_df,aes(x=(perc_bme),y=log(run_count))) +
 
 
 
-lsoa_cntrds$name[lsoa_cntrds$code == "E06000031"]
+# lsoa_cntrds$name[lsoa_cntrds$code == "E06000031"]
 
