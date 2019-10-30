@@ -54,11 +54,6 @@ Parkrun huge potential impact [Stevinson et al. 2013](https://academic.oup.com/j
 and [Stevinson et al. 2019](https://academic.oup.com/jpubhealth/advance-article/doi/10.1093/pubmed/fdy178/5123524).
 
 
-
-
-
-
-
 # Methods
 
 Data from parkrun website (event locations), parkrun (participation), Office of National Statistics.
@@ -80,6 +75,7 @@ Participation in parkrun varies between LSOA. Around half of all communities (LS
 ```{r, echo = F,fig.height=8, fig.width=8}
 library(reshape2)
 library(dplyr)
+library(tidyverse)
 library(ggplot2)
 library("viridis")
 #install.packages("corrplot")
@@ -96,15 +92,11 @@ df <- read.csv("output/lsoa_df.csv") %>%
 
 ggplot(data=df, aes(run_rate)) + 
   
-  #geom_histogram(aes(y =..density..), 
-  #               breaks=seq(0, 800/52, by = 1), 
-  #               col="darkgreen", 
-  #               fill="green", 
-  #               alpha = .2) + 
-  #
-  stat_function(fun=dpois,
-                args=fitdistr(x = df$run_rate,
-                              densfun = "Poisson")$estimate,xlim = c(0,5))
+  geom_histogram(aes(y =..density..), 
+                 breaks=seq(0, 800/52, by = 1), 
+                 col="darkgreen", 
+                 fill="green", 
+                 alpha = .2) + 
   
   #geom_density(col=2) + 
 
@@ -114,11 +106,6 @@ ggplot(data=df, aes(run_rate)) +
   
   labs(x="Average weekly runs per 1000 people", y = "Density")
 
-
-  hist( qpois(p =seq(0.01,1,0.01), 
-              lambda=mean(df$run_rate), 
-              log = FALSE),
-        breaks = seq(0, 800/52, by = 1),freq = F) 
 ```
 
 There is a negative correlation between particpation (run_count) and deprivation (imd), distance to nearest parkrun (mn_distance), population density (pop_density) and percent BME (perc_bme). Percent BME was strongly postively correlated with population density, negatively correlated with percent non-working age, and moderately positvely correlated with IMD  suggesting that areas with more BME residents are more densely populated, more deprived and have fewer older people.
@@ -131,9 +118,9 @@ There is a negative correlation between particpation (run_count) and deprivation
 setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE')
 
 ## CORRELATION MATRIX IMD ONLY
-c(1,5:11)
 cor_mat <-  read.csv("output/lsoa_df.csv") %>%
-              select(-c(1,5:11)) %>%
+              dplyr::select(run_count,imd, perc_bme, mn_dstn,  
+                      total_pop, pop_density,perc_non_working_age) %>%
               cor
       
 rownames(cor_mat) <-  colnames(cor_mat) <- substr(colnames(cor_mat),1,20)
@@ -169,7 +156,7 @@ df <- read.csv("output/lsoa_df.csv") %>%
              measure.vars ="run_rate", 
              value.name = "run_rate") %>%
   
-        select(imd_dec,bme_dec,run_rate)
+        dplyr::select(imd_dec,bme_dec,run_rate)
 
 df <- aggregate(run_rate ~ bme_dec + imd_dec, 
                 data = df, 
@@ -221,7 +208,7 @@ df <- read.csv("output/lsoa_df.csv") %>%
   
         mutate(run_rate = run_count/total_pop) %>%
 
-        select(run_rate,imd,perc_bme,
+        dplyr::select(run_rate,imd,perc_bme,
                mn_dstn,pop_density,
                perc_non_working_age)
 
