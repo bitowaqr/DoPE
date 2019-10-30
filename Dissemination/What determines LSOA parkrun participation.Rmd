@@ -45,7 +45,7 @@ We find that deprivation, distance to nearest event and ethnicity are strong pre
 
 There is strong evidence from survey data that ethnic minority individuals in England are less likely to be physcially active, and to engage in sport in general [Sport England](https://www.sportengland.org/media/3513/sports-participation-and-ethnicity-in-england-headline-findings.pdf). 
 
-Previous analysis has been conducted investigating the factors associated with higher levels of partcipation [Cleland et al., 2019](https://journals.sagepub.com/doi/pdf/10.1177/0890117118770106?casa_token=WIfzcbwmyFoAAAAA:v2iYFcITA7-__9Xn3pZvS9GRw-aIvKkDGLU1bU6__behSpsm__LwcvkTGclu79R42FECROneYL5N). However, due to the biases associated with surveying only parkrun participants the findings have no external validity (i.e. estimating the relationship between education and number of runs once engaged with parkrun does not tell us about engagement with parkrun). The authors themselves note the limitation that "The sample was limited to a nonrandom sample of parkrun participants in one State of Australia and may not be generalizable to other parkrun populations." (p.21).
+Previous analysis has been conducted investigating the factors associated with higher levels of partcipation [Cleland et al., 2019](https://journals.sagepub.com/doi/pdf/10.1177/0890117118770106?casa_token=WIfzcbwmyFoAAAAA:v2iYFcITA7-__9Xn3pZvS9GRw-aIvKkDGLU1bU6__behSpsm__LwcvkTGclu79R42FECROneYL5N). However, due to the biases associated with surveying only parkrun participants the findings have no external validity (i.e. estimating the relationship between education and number of runs once engaged with parkrun does not tell us about the determinants of initial engagement with parkrun). The authors themselves note the limitation that "The sample was limited to a nonrandom sample of parkrun participants in one State of Australia and may not be generalizable to other parkrun populations." (p.21).
 
 Previous research found IMD very important and ethnic diversity low [goyder et al. 2018](https://jech.bmj.com/content/jech/72/Suppl_1/A61.2.full.pdf) "community events of this nature are, whilst likely to provide health benefits to the population as a whole, also likely to
 be responsible for significant intervention generated inequalities in uptake of opportunities for physically active recreation."
@@ -56,25 +56,25 @@ and [Stevinson et al. 2019](https://academic.oup.com/jpubhealth/advance-article/
 
 # Methods
 
-[parkrunUK](https://www.parkrun.org.uk/) made 
+Data was obtained from multiple sources at the Lower layer Super Output Level, which are geographical areas containing around 1,000-3,000 people. There are 32844 LSOAs in England. [parkrunUK](https://www.parkrun.org.uk/) provided data on the number of runs from each LSOA in England between the dates XXX and XXX. The ethnic breakdown of each LSOA was obtained from the Office of National Statistics (ONS) [here](https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/lowersuperoutputareamidyearpopulationestimates). The deprivation scores & population sizes for each LSOA was obtained from the ONS. More information can be found [here](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/835115/IoD2019_Statistical_Release.pdf). The population density for each LSOA was obtained from the ONS [here](https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/lowersuperoutputareapopulationdensity). The geographic weighted centroids for each LSOA were obtained from the ONS [here](http://census.ukdataservice.ac.uk/get-data/boundary-data.aspx). The location of each parkrun event was obtained from the parkrunUK website [here](https://www.parkrun.org.uk/).
 
+| Variable        | Description           | Source  |
+| :----- |:--------| :---------|
+| run_count     | number of runs from each LSOA in England between XXX and XXX | parkrunUK |
+| imd           | IMD scores for each LSOA      |   https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/835115/IoD2019_Statistical_Release.pdf |
+| total_pop | total number of individuals in each LSOA     |    https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/835115/IoD2019_Statistical_Release.pdf |
+| pop_density     | population density for each LSOA | https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/lowersuperoutputareapopulationdensity |
+| perc_bme    | percent of population non-white-british | https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/lowersuperoutputareamidyearpopulationestimates | 
+| mn_dstn     | distance from LSOA centroid to nearest parkrun | derived|
+| perc_non_working_age | derived from ONS data on age-groups in each LSOA | derived |
+| run_rate    | derived from run_count and LSAO populations | derived |
 
+After merging these datasets we had detailed data on 32844 LSOAs participation in parkrun and several characteristics of the LSOAs which we hypothesised may influence participation. Since previous work has found corelations between participation and deprivation, distance to nearest event, and population density we included all of these variables. We also extended the analysis to include the percent of the population of black and ethnic minority and the percent of the population who are working age. We included ethnicity as we hypothesised that areas with higher percentages of residents of ethnic minorities would have lower participation rates. We included the percent of the population that is working age as a control to limit for the effect of populations heavily skewed toward older people (e.g. care homes), or very young people (e.g orphanages/immediately around special needs schools)). Since participation in parkrunUK is dominated by those aged 20-60 we felt this was justified.   
 
-Data from parkrun website (event locations), parkrun (participation), Office of National Statistics.
-
-Merged datasets.
-
-Simple correlations and poisson regression.
-By combining data provided by parkrun on the location of events and the number of participants from each LSAO in England over a 12 month period with characteristics on each LSOA from ONS data (INSERT LINK) including population density, Index of Multiple Deprivation scores and ethnic make-up it was possible to answer questions at the community level. 
-
-32844 LSOAs with 
-
-
+We used R Software Environment to produce simple summary statistics and viewed simple correlations between the variables described. We then moved on to estimate the partial correlation coefficients between the variables, before running a poisson regression model on scaled data to estimate the relative influence of several determinants on parkrun participation.
 
 # Results
-Participation in parkrun varies between LSOA. Around half of all communities (LSOA) average less than 1 run per week per 1000 people. Approximately a quarter average between 1 and 2 runs, and around an eighth between 2 and 3 runs.
-
-
+Participation in parkrun varies between LSOAs. Around half of all communities (LSOA) average less than 1 run per week per 1000 people. Approximately a quarter average between 1 and 2 runs, and around an eighth between 2 and 3 runs.
 
 ```{r, echo = F,fig.height=8, fig.width=8}
 library(reshape2)
@@ -112,9 +112,8 @@ ggplot(data=df, aes(run_rate)) +
 
 ```
 
-There is a negative correlation between particpation (run_count) and deprivation (imd), distance to nearest parkrun (mn_distance), population density (pop_density) and percent BME (perc_bme). Percent BME was strongly postively correlated with population density, negatively correlated with percent non-working age, and moderately positvely correlated with IMD  suggesting that areas with more BME residents are more densely populated, more deprived and have fewer older people.
-
 ## Correlation Matrix
+There is a negative correlation between particpation (run_count) and deprivation (imd), distance to nearest parkrun (mn_distance), population density (pop_density) and percent BME (perc_bme). Percent BME was strongly postively correlated with population density, negatively correlated with percent non-working age, and moderately positvely correlated with IMD  suggesting that areas with more BME residents are more densely populated, more deprived and have fewer older people.
 
 ```{r, echo = F,fig.height=8, fig.width=8}
 
@@ -317,19 +316,23 @@ summary(model4)
 x = summary(model4)
 
 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
-
-
 ```
 
     
 # Discussion
 
-Previous analysis has shown that participation in physical activity generally, and parkrun in particular, is lower in deprived communities. 
+Previous analysis by [Scheider et al., 2019](https://www.medrxiv.org/content/early/2019/08/29/19004143.full.pdf) has showed that participation in parkrun is lower in more deprived communities, and communities that are further from their nearest parkrun. This paper extends that analysis to include other community level characteristics which were hypothesized to influence parkrun participation. Our findings show that some of the negative effect on participation previously attributed to deprivation can actually be attributed to differences in participation by ethnic minotiries.
 
-This paper has investigated the relationship between participation, distance and deprivation. Our findings show that some of the negative effect of deprivation on participation can actually be attributed to differences in participation by ethnicity.
+We find that communities with higher percentages of ethnic minority residents were less likely to participate in parkrun, even when controlling for deprivation. Since percentage ethnic minorotiy residents and deprivation are positively correlated, it is likely that some of the effect attributed to deprivation in our previous analysis [Scheider et al., 2019](https://www.medrxiv.org/content/early/2019/08/29/19004143.full.pdf) is is attributable to ethnicity. In short, the socioeconomic gradient in parkrun participation is shallower than perviously thought, but the ethnic gradient revealed.
 
-We find that communities with higher percentages of ethnic minority residents were less likely to participate in parkrun, even when controlling for deprivation. Since percentage ethnic minoroties and deprivation are positively correlated, it is likely that some of the effect attributed to deprivation in previous analysis (Schneider et al. 2019) is in part attributable to ethnicity. In short, the socioeconomic gradient in parkrun participation is shallower than perviously thought, but the ethnic gradient revealed.
+That communities with a higher percentage of ethnic minority residents have lower participation rates in parkrun may not be a public health problem in and of itself. Different communities may freely choose to take part in different types of physical activity for many reasons. But given physical actiivty levels in these communities are also lower (REF), it seems there is an opportunity for parkrun to develop methods of reaching groups who have low rates of physical activity engagement, with huge public health potential. 
 
-That communities with a higher percentage of ethnic minority residents have lower participation rates in parkrun may not be a public health problem in and of itself. Different communities may freely choose to take part in different types of physical activity for many reasons. But given physical actiivty levels in these commuities are also lower, it seems there is an opportunity for parkrun to develop methods of reaching groups who have low rates of engagement, with huge public health potential.
+# Limitations
+
+This analysis is cross-sectional, using data on participation in parkrun events between 1st January and 10th December. We have not studied how participation rates have changed over time, therefore it is possible that participation is changing at different rates in different LSOAs, and therefore deprived communities and communities with higher proportions of ethnic minority residents may be decreasing or increasing relative to the population average. It would be interesting to replicate this analysis for each year from 2010-2020 to see how parkrun has grown over time.
+
+Our dependent variable is the number of runs by residents of each LSOA. This is a count variable where each run is treated equally (e.g. 10 runs by one person is equal to 1 run by 10 people). We cannot therefore draw inferences on the number of people who took part within each LSOA at some point in the year, but instead focus on the total run count.  
+
+This analysis has been conducted at the LSOA level. Therefore we have been careful to say that participation is lower in areas with higher proportions of ethnic minority residents. It is not possible to make inferences about the effect of deprivation and ethnicity at a individual level from this data. However previous qualitative analysis [Goyder et al.,2018](https://jech.bmj.com/content/jech/72/Suppl_1/A61.2.full.pdf) has identified the small number of participants from ethnic minorities as an avenue for further research.
 
 # References
