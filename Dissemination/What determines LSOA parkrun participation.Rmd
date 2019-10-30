@@ -147,6 +147,14 @@ df <-  read.csv("../output/lsoa_df.csv") %>%
 # ggplot(df) +
 #   geom_histogram(aes(perc_bme),fill="cyan",alpha=0.5,col="blue")
 
+# boxplots  run_count~ bme_10
+# bme_10 = cut(df$perc_bme,breaks = quantile(df$perc_bme,probs=seq(0,1,by=0.1)),include.lowest = T)
+# ggplot(df) +
+#   geom_boxplot(aes(y=run_count,fill= bme_10,x=bme_10)) +
+#   ylim(c(0,500)) +
+#   theme()
+
+
 ## Association plot
 ggplot(df) +
   geom_point(aes(x=perc_bme*100,y=run_count),col="purple",alpha=0.3,size=0.5) +
@@ -198,13 +206,13 @@ df <- read.csv("../output/lsoa_df.csv") %>%
   
         dplyr::select(imd_dec,bme_dec,run_rate,pop_density)
 
-df$pop_density_bins = cut(df$pop_density,
-                          quantile(df$pop_density,
-                                   probs = c(0,0.25,0.5,0.75,1)),
-                          include.lowest = T,
-                          labels = c("Lowest density","low density","high density","highest density"))
+# df$pop_density_bins = cut(df$pop_density,
+#                           quantile(df$pop_density,
+#                                    probs = c(0,0.25,0.5,0.75,1)),
+#                           include.lowest = T,
+#                           labels = c("Lowest density","low density","high density","highest density"))
 
-df <- aggregate(run_rate ~ bme_dec + imd_dec + pop_density_bins, 
+df <- aggregate(run_rate ~ bme_dec + imd_dec, # + pop_density_bins, 
                 data = df, 
                 FUN= "mean")
 
@@ -213,8 +221,7 @@ ggplot(data = df,
   geom_tile()+
   scale_fill_viridis(discrete=FALSE) +
   xlab("% Ethnic minorities (percentiles)")+
-  ylab("Multiple Deprivation Index (percentiles)") +
-  facet_wrap(~pop_density_bins,nrow = 2)
+  ylab("Multiple Deprivation Index (percentiles)") # + facet_wrap(~pop_density_bins,nrow = 2)
 
 # ACCESS
 #
@@ -379,6 +386,21 @@ stargazer(
   ci=TRUE, ci.level=0.95,
   title="Regression Results")
 
+
+
+
+#### bme percentile model
+# bme_10 = cut(df$perc_bme,breaks = quantile(df$perc_bme,probs=seq(0,1,by=0.1)),include.lowest = T)
+# model5 <- glm(run_count ~ imd + mn_dstn + 
+#                 perc_non_working_age + pop_density + bme_10,
+#              data = scaled_df,
+#              family = poisson(link="log"),
+#              offset = log(total_pop))
+# 
+# summary(model5)
+# 
+# x = summary(model5)
+# r2.5 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
 
 ```
 
