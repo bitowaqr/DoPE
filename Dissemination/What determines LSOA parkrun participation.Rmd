@@ -48,12 +48,6 @@ There is strong evidence from survey data that ethnic minority individuals in En
 Previous analysis has been conducted investigating the factors associated with higher levels of partcipation [Cleland et al., 2019](https://journals.sagepub.com/doi/pdf/10.1177/0890117118770106?casa_token=WIfzcbwmyFoAAAAA:v2iYFcITA7-__9Xn3pZvS9GRw-aIvKkDGLU1bU6__behSpsm__LwcvkTGclu79R42FECROneYL5N). However, due to the biases associated with surveying only parkrun participants the findings have no external validity (i.e. estimating the relationship between education and number of runs once engaged with parkrun does not tell us about engagement with parkrun). The authors themselves note the limitation that "The sample was limited to a nonrandom sample of parkrun participants in one State of Australia and may not be generalizable to other parkrun populations." (p.21).
 
 
-
-
-
-
-
-
 # Methods
 
 Data from parkrun website (event locations), parkrun (participation), Office of National Statistics.
@@ -68,7 +62,8 @@ By combining data provided by parkrun on the location of events and the number o
 
 
 # Results
-Participation in parkrun varies between LSOA.
+
+Participation in parkrun varies a lot between different communities (LSOAs). Around half of all communities average less than 1 run per week per 1000 people. Approximately a quarter average between 1 and 2 runs, and around an eighth between 2 and 3 runs.
 
 ```{r, echo = F,fig.height=8, fig.width=8}
 library(reshape2)
@@ -84,19 +79,33 @@ rm(list = ls())
 setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE')
 
 df <- read.csv("output/lsoa_df.csv") %>% 
-        mutate(run_rate = run_count/total_pop)
+        mutate(run_rate = run_count/total_pop * 1000/52)
 
-hist(df$run_rate)
+ggplot(data=df, aes(run_rate)) + 
+  
+  geom_histogram(aes(y =..density..), 
+                 breaks=seq(0, 800/52, by = 1), 
+                 col="darkgreen", 
+                 fill="green", 
+                 alpha = .2) + 
+  
+  #geom_density(col=2) + 
 
+  theme_classic() +
+  
+  labs(title="Distribution of LSOA parkrun participation") +
+  
+  labs(x="Average weekly runs per 1000 people", y = "Density")
 
 ```
 
-There is a negative correlation between particpation (run_count) and deprivation (imd), distance to nearest parkrun (mn_distance), population density (pop_density) and percent BME (perc_bme). Percent BME was strongly postively correlated with population density, negatively correlated with percent non-working age, and moderately positvely correlated with IMD  suggesting that areas with more BME residents are more densely populated, more deprived and have fewer older people.
+
 
 ## Correlation Matrix
 
-```{r, echo = F,fig.height=8, fig.width=8}
+We are interested in what the determinants of community level participation in parkrun are. The plot below show a correlation matrix for the different variables of interest. There is a negative correlation between particpation (run_count) and deprivation (imd), distance to nearest parkrun (mn_distance), population density (pop_density) and percent BME (perc_bme). Percent BME was strongly postively correlated with population density, negatively correlated with percent non-working age, and moderately positvely correlated with IMD  suggesting that areas with more BME residents are more densely populated, more deprived and have fewer older people.
 
+```{r, echo = F,fig.height=8, fig.width=8}
 
 setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE')
 
@@ -117,15 +126,15 @@ corrplot(corr = cor_mat,
 
 ## Colour plot
 
-We are interested in particular in how participation in parkrun varies by the percent BME and IMD of the community. We split our LSOA into deciles based on the two variables and represent the mean participation rate for LSOAs which fall into the repsective deciles (e.g. 2,5 means decile 2 for BME and 5 for IMD) as a colour on the plot. 
+Since we are particularly interested in how participation in parkrun varies by the percent of the population reporting as being Black and Ethnic minotity, as well as more and less deprived we split our 32844 communities (LSOAs) into deciles based on the two variables. This creates 100 groups (10*10 combinations). The plot below shows the mean participation rate for each of these 100 groups of LSOAs, where 10 represents most deprived and most BME and 1 least deprived and BME, as a colour on the plot. 
 
-The plot shows that participation is lowest in areas with the highest deprivation, and that there is a complex relationship between ethnicity and participation, with higher participation in areas with moderately high percentage BME. 
+The plot shows that participation is lowest in areas with the highest deprivation, and that there is a complex relationship between ethnicity and participation, with higher participation in areas with moderately high percentage BME, but lower participation in areas with very high BME populations. 
 
 ```{r, echo=F,fig.height=8, fig.width=8}
 # RUN RATE
 df <- read.csv("output/lsoa_df.csv") %>% 
   
-        mutate(run_rate = run_count/total_pop,
+        mutate(run_rate = run_count/total_pop* 1000/52,
                imd_dec = cut(x = imd,
                                breaks = quantile(imd,seq(0,1,0.1)),
          ordered_result = T,
@@ -181,7 +190,7 @@ ggplot(data = df,
 
 In order to control for confounders, we created a partial correlation matrix. This estimates the correlation between the variables in the analysis holding all other variables constant.
 
-Looking at the top row, it is clear that participation rates and deprivation is strongly correlated, but less so now we are controlling for other variables. Distance is also strongly correlated, as our previous analysis published in XXX showed. The percent BME is also negatively correlated, suggesting that some of the relationship between participation and IMD is attributable to the ethnicity of residents.
+Looking at the top row, even when controlling for other variables such it is clear that participation rate is still strongly negatively correlated with deprivation and distance and moderately negatively correlated with percent BME.
 
 ## Partial correlation matrix
 ```{r echo=FALSE, fig.height=8, fig.width=8}
@@ -221,7 +230,7 @@ partial.r(data = df) %>%
 
 Poisson models are commonly used to estimate count data, where values are constrained by 0. In this case, because it is not possible for a community to have negative participation we use a Poisson regression.
 
-The results of the poisson regression are not notoriously easy to interpret, but show that areas with a higher percent of residents who are non-White-British have lower participation rates, even when controlling for the effect of deprivation and distance to events. The effect is smaller than deprivation and distance, but still sizeable and significant. 
+The results of the poisson regression are not notoriously easy to interpret, but show that areas with a higher percent of residents who are non-White-British have lower participation rates, even when controlling for the effect of deprivation and distance to events. The effect is smaller than deprivation and distance, but still sizeable and significant. The model explains a moderate percentage of the variation.  
 
 ```{r, echo = FALSE}
 rm(list = ls())
