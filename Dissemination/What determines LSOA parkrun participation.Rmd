@@ -1,7 +1,9 @@
 ---
-output: pdf_document
-editor_options: 
+editor_options:
   chunk_output_type: console
+output:
+  word_document: default
+  pdf_document: default
 ---
 
 # What determines community level parkrun participation? 
