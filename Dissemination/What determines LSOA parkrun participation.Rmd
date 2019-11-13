@@ -2,8 +2,8 @@
 editor_options:
   chunk_output_type: console
 output:
-  pdf_document: default
   word_document: default
+  pdf_document: default
 ---
 
 # Does ethnic density influence community participation in local running events?: a case of parkrun
