@@ -1,9 +1,10 @@
 ---
+bibliography: bibliography.bib
 editor_options:
   chunk_output_type: console
 output:
-  word_document: default
   pdf_document: default
+  word_document: default
 ---
 
 # Does ethnic density influence community participation in local running events?: a case of parkrun
@@ -28,7 +29,7 @@ output:
 ### Thumbnail Sketch
 
 #### What is already known on this subject?
-parkrun organise weekly 5km running events at parks across the world.Recent research has shown that despite equitable geographical access to parkrun events in England, participation is much lower in more deprived areas. 
+parkrun organise weekly 5km running events at parks across the world. Recent research has shown that despite equitable geographical access to parkrun events in England, participation is much lower in more deprived areas. 
 
 #### What this study adds?
 This study uses regression modelling techniques to better understand the relative influence of geographical access, deprivation and ethnic density on parkrun participation rates in local communities. It finds that areas with higher ethnic density tend to have lower participation rates when controlling for confounding factors. 
@@ -52,24 +53,24 @@ knitr::opts_chunk$set(echo = FALSE,
 ```
 # Abstract
 
-parkrun has been very successful in encouraging people in England to participate in their weekly 5km running events. However, there is substantial heterogeneity in parkrun participation across different communities in England: after controlling for travel distances, deprived communities have significantly lower participation rates (Schneider et al. 2019).
+parkrun has been very successful in encouraging people in England to participate in their weekly 5km running events. However, there is substantial heterogeneity in parkrun participation across different communities in England: after controlling for travel distances, deprived communities have significantly lower participation rates [@schneider2019].
 
-This paper aims to expand on previous findings by investigating ethnic disparities in parkrun participation. We combined geo-spatial data, provided by parkrun and available through the ONS, and fitted multivariable Poisson regression models to study the effect of ethnic minorities on participation rates at the aggregate census area level.
+This paper aims to expand on previous findings by investigating ethnic disparities in parkrun participation. We combined geo-spatial data, provided by parkrun and available through the ONS, and fitted multivariable Poisson regression models to study the effect of ethnic density on participation rates at the aggregate census area level.
 
-We find that areas with a higher proportion of ethnic minorities had lower participation rates. This effect is independent of areas with high deprivation and a high proportion of ethnic minorities have the lowest participation rates. An opportunity exists for parkrun to engage with these communities and reduce potential barriers to participation.
+We find that areas with higher ethnic density have lower participation rates. This effect is independent of deprivation. An opportunity exists for parkrun to engage with these communities and reduce potential barriers to participation.
 
 # Introduction
 
-parkrun is a collection of free mass participation 5km running events that takes place every Saturday morning. There are currently over 500 locations in England, with a combined weekly attendance of over 100,000. parkrun has been identified as being successful at engaging with individuals who may not otherwise have taken part in organised physical activity [Haake, 2018](http://shura.shu.ac.uk/24200/1/Haake_%20parkrun_a_new_model%28VoR%29.pdf) ; [Stevinson et al. 2013](https://academic.oup.com/jpubhealth/article/36/2/268/1548895), and there is some evidence that it has increased overall physical activity levels in participants [Stevinson et al. 2019](https://academic.oup.com/jpubhealth/advance-article/doi/10.1093/pubmed/fdy178/5123524). Overall, there is a consensus that parkrun has huge public health potential [Reece et al. 2019](https://bjsm.bmj.com/content/bjsports/53/6/326.full.pdf?casa_token=YEz1sYUvjksAAAAA:SABmbZd7t_qrEFEoWSWQkPZt3BCSLaBswWiFguQaSdXEEj_QI2IyBhDroWsScjq1EGiHHEvWbjc).
+parkrun is a collection of free mass participation 5km running events that takes place every Saturday morning. There are currently over 500 locations in England, with a combined weekly attendance of over 100,000. parkrun has been identified as being successful at engaging with individuals who may not otherwise have taken part in organised physical activity [@haake2018parkrun; @stevinson2013exploring], and there is some evidence that it has increased overall physical activity levels in participants [@stevinson2018changes]. Overall, there is a consensus that parkrun has huge public health potential [@reece2019bright].
 
-However, research from Sheffield [Goyder et al. 2018] and more broadly the UK [Fullagar et al. 2019](https://www.researchgate.net/profile/Simone_Fullagar/publication/336717033_Fullagar_S_Petris_S_Sargent_J_Allen_S_Akhtar_M_Ozakinci_G_in_press_2019_Action_research_with_parkrun_UK_volunteer_organisers_to_develop_inclusive_strategies_Health_Promotion_International/links/5db23b0c4585155e27f966d2/Fullagar-S-Petris-S-Sargent-J-Allen-S-Akhtar-M-Ozakinci-G-in-press-2019-Action-research-with-parkrun-UK-volunteer-organisers-to-develop-inclusive-strategies-Health-Promotion-International.pdf) identified that parkruns located in more deprived areas have lower attendances, and that ethnic diversity was limited, leading to a concern that as with many public health interventions, parkrun is "likely to
-be responsible for significant intervention generated inequalities in uptake of opportunities for physically active recreation." [Goyder et al. 2018](https://jech.bmj.com/content/jech/72/Suppl_1/A61.2.full.pdf). 
+However, research from Sheffield [@goyder2018p2] and more broadly the UK [@fullagar2019action] identified that parkruns located in more deprived areas have lower attendances, and that ethnic diversity was limited, leading to a concern that as with many public health interventions, parkrun is "likely to
+be responsible for significant intervention generated inequalities in uptake of opportunities for physically active recreation." [@goyder2018p2]. 
 
-Understanding the determinants of participation in parkrun is therefore an important avenue of future research. A study from Australia using survey data from parkrun participants attempted to do this  [Cleland et al., 2019](https://journals.sagepub.com/doi/pdf/10.1177/0890117118770106?casa_token=WIfzcbwmyFoAAAAA:v2iYFcITA7-__9Xn3pZvS9GRw-aIvKkDGLU1bU6__behSpsm__LwcvkTGclu79R42FECROneYL5N). However, due to the biases associated with surveying only parkrun participants the findings have no external validity (i.e. estimating the relationship between education and number of runs once engaged with parkrun does not tell us about the determinants of initial engagement with parkrun). The authors themselves note the limitation that "The sample was limited to a non-random sample of parkrun participants in one State of Australia and may not be generalizable to other parkrun populations." (p.21). 
+Understanding the determinants of participation in parkrun is therefore an important avenue of future research. A study from Australia using survey data from parkrun participants attempted to do this [@cleland2019exploring]. However, due to the biases associated with surveying only parkrun participants the findings have no external validity (i.e. estimating the relationship between education and number of runs once engaged with parkrun does not tell us about the determinants of initial engagement with parkrun). The authors themselves note the limitation that "The sample was limited to a non-random sample of parkrun participants in one State of Australia and may not be generalizable to other parkrun populations." (p.21). 
 
-Our previous work attempting to locate the optimal parks in which to locate the next 200 parkrun events, revealed that there is substantial heterogeneity in parkrun participation across different communities in England: after controlling for travel distances, deprived communities have significantly lower participation rates (Schneider et al. 2019). This analysis was able to quantify, for the first time, how participation in parkrun varied in different communities in England. However, the analysis was interested only in the relationship between participation, access and deprivation and did not consider other potential determinants of participation in parkrun. This paper extends this part of our previous analysis to better understand how access, deprivation, ethnicity, population density and age of the community influence parkrun participation.
+Our previous work attempting to locate the optimal parks in which to locate the next 200 parkrun events, revealed that there is substantial heterogeneity in parkrun participation across different communities in England: after controlling for travel distances, deprived communities have significantly lower participation rates [@schneider2019]. This analysis was able to quantify, for the first time, how participation in parkrun varied in different communities in England. However, the analysis was interested only in the relationship between participation, access and deprivation and did not consider other potential determinants of participation in parkrun. This paper extends this part of our previous analysis to better understand how access, deprivation, ethnicity, population density and age of the community influence parkrun participation.
 
-Our initial hypothesis was that areas with a higher proportion of ethnic minority residents have lower participation in parkrun. We thought this because 1) there is strong evidence from survey data that ethnic minority individuals in England are less likely to be physcially active, and to engage in sport in general [Sport England](https://www.sportengland.org/media/3513/sports-participation-and-ethnicity-in-england-headline-findings.pdf), 2) previous research has identified low levels of ethnic minority participation in parkrun [Goyder et al. 2018](https://jech.bmj.com/content/jech/72/Suppl_1/A61.2.full.pdf)  [Fullagar et al. 2019](https://www.researchgate.net/profile/Simone_Fullagar/publication/336717033_Fullagar_S_Petris_S_Sargent_J_Allen_S_Akhtar_M_Ozakinci_G_in_press_2019_Action_research_with_parkrun_UK_volunteer_organisers_to_develop_inclusive_strategies_Health_Promotion_International/links/5db23b0c4585155e27f966d2/Fullagar-S-Petris-S-Sargent-J-Allen-S-Akhtar-M-Ozakinci-G-in-press-2019-Action-research-with-parkrun-UK-volunteer-organisers-to-develop-inclusive-strategies-Health-Promotion-International.pdf). 
+Our initial hypothesis was that areas with a higher proportion of ethnic minority residents have lower participation in parkrun. We thought this because 1) there is strong evidence from survey data that ethnic minority individuals in England are less likely to be physcially active, and to engage in sport in general [@rowe2000sport], 2) previous research has identified low levels of ethnic minority participation in parkrun [@goyder2018p2; @fullagar2019action]. 
 
 # Methods
 
@@ -78,17 +79,17 @@ Data was obtained from multiple sources at the Lower layer Super Output Level, w
 | Variable        | Description           | Source  |
 | :----- |:--------| :---------|
 | run_count     | number of runs from each LSOA in England between 1st January and 10th December 2018 | parkrunUK |
-| imd           | IMD scores for each LSOA      |   https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/835115/IoD2019_Statistical_Release.pdf |
-| total_pop | total number of individuals in each LSOA     |    https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/835115/IoD2019_Statistical_Release.pdf |
-| pop_density     | population density for each LSOA | https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/lowersuperoutputareapopulationdensity |
-| perc_bme    | Ethnic Density: percent of population non-white-british | https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/lowersuperoutputareamidyearpopulationestimates | 
+| imd           | IMD scores for each LSOA      |   ONS |
+| total_pop | total number of individuals in each LSOA     |    ONS |
+| pop_density     | population density for each LSOA | ONS |
+| perc_bme    | Ethnic Density: percent of population non-white-british | ONS | 
 | mn_dstn     | distance from LSOA centroid to nearest parkrun | derived|
 | perc_non_working_age | derived from ONS data on age-groups in each LSOA | derived |
 | run_rate    | derived from run_count and LSAO populations | derived |
 
 After merging these datasets we had detailed data on 32844 LSOAs participation in parkrun and several characteristics of the LSOAs which we hypothesised may influence participation. Since previous work has found corelations between participation and deprivation, distance to nearest event, and population density we included all of these variables. We also extended the analysis to include the percent of the population of black and ethnic minority (our simple proxy for ethnic density) and the percent of the population who are working age. We are interested in ethnic density as we hypothesised that areas with higher ethnic density would have lower participation rates. We included the percent of the population that is working age as a control to limit for the effect of populations heavily skewed toward older people (e.g. care homes), or very young people (e.g orphanages/immediately around special needs schools)). Since participation in parkrunUK is dominated by those aged 20-60 we felt this was justified.   
 
-We used R Software Environment to produce simple summary statistics and viewed simple correlations between the variables described. We then moved on to estimate the partial correlation coefficients between the variables, before running a poisson regression model on scaled data to estimate the relative influence of several determinants on parkrun participation.
+We used R Software Environment [@base_r] to produce simple summary statistics and viewed simple correlations between the variables described using packages created by @corrplot2017. We then moved on to estimate the partial correlation coefficients between the variables, again with @corrplot2017, before running a poisson regression model on scaled data to estimate the relative influence of several determinants on parkrun participation. All graphs are created with ggplot2 [@ggplot2], the results of the poisson regression model were displayed using the stargazer package [@stargazer].
 
 # Results
 Participation in parkrun varies between LSOAs. Around half of all communities (LSOA) average less than 1 run per week per 1000 people. Approximately a quarter average between 1 and 2 runs, and around an eighth between 2 and 3 runs. 
@@ -292,7 +293,7 @@ ggplot(data = df,
 
 In order to control for confounders, we created a partial correlation matrix. This estimates the correlation between the variables in the analysis holding all other variables constant.
 
-Looking at the top row, it is clear that participation rates and deprivation is strongly correlated, but less so now we are controlling for other variables. Distance is also strongly correlated, as was the case in [Schneider et al., 2019]. Ethnic density is also negatively correlated, suggesting that some of the relationship between participation and IMD is attributable to the ethnic density of the area.
+Looking at the top row, it is clear that participation rates and deprivation is strongly correlated, but less so now we are controlling for other variables. Distance is also strongly correlated, as was the case in our previous analysis [@schneider2019]. Ethnic density is also negatively correlated, suggesting that some of the relationship between participation and IMD is attributable to the ethnic density of the area.
 
 
 ```{r echo=FALSE, fig.height=6, fig.width=8}
@@ -426,7 +427,7 @@ stargazer(
   model1,model4,model2,
   column.labels	= c("Original scale","Scaled - min model","Scaled - full model"),
   ci=TRUE, ci.level=0.95,
-  title="Regression Results")
+  title="Regression Results",header = FALSE)
 
 
 
