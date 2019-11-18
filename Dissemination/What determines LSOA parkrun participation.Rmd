@@ -92,7 +92,9 @@ After merging these datasets we had detailed data on 32844 LSOAs participation i
 We used R Software Environment [@base_r] to produce simple summary statistics and viewed simple correlations between the variables described using packages created by @corrplot2017. We then moved on to estimate the partial correlation coefficients between the variables, again with @corrplot2017, before running a poisson regression model on scaled data to estimate the relative influence of several determinants on parkrun participation. All graphs are created with ggplot2 [@ggplot2], the results of the poisson regression model were displayed using the stargazer package [@stargazer].
 
 # Results
-Participation in parkrun varies between LSOAs. Around half of all communities (LSOA) average less than 1 run per week per 1000 people. Approximately a quarter average between 1 and 2 runs, and around an eighth between 2 and 3 runs. 
+
+## Descriptive Statistics
+Participation in parkrun varies between LSOAs. Around half of all communities (LSOA) average less than 1 run per week per 1000 people. Approximately a quarter average between 1 and 2 runs, and around an eighth between 2 and 3 runs. There is also considerable variation in ethnic density, nearest event and IMD score.
 
 ```{r, echo = F,fig.height=5, fig.width=8}
 library(reshape2)
@@ -104,29 +106,73 @@ library("viridis")
 library(corrplot)
 library(ggplot2)
 library(fitdistrplus)
-
-rm(list = ls())
-
  #setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE')
 
-df <- read.csv("../output/lsoa_df.csv") %>% 
-        mutate(run_rate = run_count/total_pop * 1000/52)
+#df <- read.csv("./output/lsoa_df.csv") %>% 
+#        mutate(run_rate = run_count/total_pop * 1000/52)
 
-ggplot(data=df, aes(run_rate)) + 
-  
+# distribution of 
+df <- read.csv("../output/lsoa_df.csv") %>%
+              dplyr::select(run_count,imd, perc_bme, mn_dstn,  
+                      total_pop, pop_density,perc_non_working_age) %>% 
+              mutate(run_rate = run_count/total_pop * 1000/52)
+
+# distribution of run rates
+plot_part <- (ggplot(data=df, aes(run_rate)) + 
   geom_histogram(aes(y =..density..), 
                  breaks=seq(0, 800/52, by = 1), 
                  col="darkgreen", 
                  fill="green", 
                  alpha = .2) + 
-  
   #geom_density(col=2) + 
-
   theme_minimal() +
-  
-  labs(title="Distribution of LSOA parkrun participation rate") +
-  
-  labs(x="Average weekly runs per 1000 people", y = "Density")
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs(title="Participation") +
+  labs(x="Finishers per 1000 persons", y = "Density"))
+
+# distribution of imd rates
+plot_imd <- (ggplot(data=df, aes(imd)) + 
+  geom_histogram(aes(y =..density..), 
+                 col="darkgreen", 
+                 fill="green", 
+                 alpha = .2) + 
+  #geom_density(col=2) + 
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs(title="IMD Score") +
+  labs(x="IMD Score", y = "Density"))
+
+# disetribution of Ethnic Density
+plot_ed <- (ggplot(data=df, aes(perc_bme)) + 
+  geom_histogram(aes(y =..density..),
+                 col="darkgreen", 
+                 fill="green", 
+                 alpha = .2) + 
+  #geom_density(col=2) + 
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs(title="Ethnic Density") +
+  labs(x="% non-WhiteBritish", y = "Density"))
+
+# distribution of distance to nearest event
+plot_dist <- (ggplot(data=df, aes(mn_dstn)) + 
+  geom_histogram(aes(y =..density..),
+                 col="darkgreen", 
+                 fill="green", 
+                 alpha = .2) + 
+  #geom_density(col=2) + 
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))+
+  xlim(c(0,40))+
+  labs(title="Nearest event") +
+  labs(x="Distance (km)", y = "Density"))
+
+library(gridExtra)
+grid.arrange(plot_part,plot_imd,plot_dist,plot_ed,ncol=2,nrow=2)
+
+
+
+
 
 ```
 
