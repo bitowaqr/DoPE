@@ -338,6 +338,8 @@ Looking at the top row, it is clear that participation rates and deprivation is 
 
 *This no longer holds for some reason*
 
+<!-- PROBLEM: this is the R2 for a linear regression. we use poisson, so we need something like
+a partial pseudo r...?!-->
 
 ```{r echo=FALSE, fig.height=6, fig.width=8}
 library(psych)
