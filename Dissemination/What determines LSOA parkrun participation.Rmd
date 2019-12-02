@@ -47,7 +47,7 @@ knitr::opts_chunk$set(echo = FALSE,
                       error = FALSE, 
                       message = FALSE, 
                       tidy = TRUE)
-# knitr::opts_knit$set(root.dir = 'C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE')
+# knitr::opts_knit$set(root.dir = 'C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE/Dissemination')
 
 
 ```
@@ -105,7 +105,7 @@ library("viridis")
 library(corrplot)
 library(ggplot2)
 library(fitdistrplus)
- #setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE')
+ #setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE/Dissemination')
 
 #df <- read.csv("./output/lsoa_df.csv") %>% 
 #        mutate(run_rate = run_count/total_pop * 1000/52)
@@ -258,37 +258,50 @@ ggplot(df) +
 
 ## Colour plot
 
-We are interested in particular in how participation in parkrun varies by ethnic density and IMD of the community. We split our LSOA into deciles based on the two variables and represent the mean participation rate for LSOAs which fall into the repsective deciles (e.g. 2,5 means decile 2 for Ethnic Density and 5 for IMD) as a colour on the plot. 
+We are interested in particular in how participation in parkrun varies by ethnic density and IMD of the community. The colour plots below show the participation levels for LSOA by deprivation and ethnic density for Urban Major, Urban Minor and Rural areas. The yellow areas are those with high rates of participation, and the dark blue are areas with low levels of participation. 
 
-The plot shows that participation is lowest in areas with the highest deprivation, and that there is a complex relationship between ethnic density and participation, with higher participation in areas with moderately high percentage BME. It is important to note that we do not control for other factors, such as the age of residents or the population density and there are therefore many confounding factors. 
+The plot shows that participation is generally greatest in areas that have low levels of deprivation and low levels of ethnic density (bottom left), and lowest in areas with high levels of deprivation and high ethnic density (top-right). Areas with high deprivation, or high ethnic density, tended to have low participation. The relationship was robust to Urban Major areas and Urban Minor areas but did not hold in Rural areas where data was more limited. It is important to note that we do not control for other factors, such as the age of residents or the population density and there are therefore many confounding factors.
 
 ```{r, echo=F,fig.height=5, fig.width=8}
+
 # RUN RATE
-df <- read.csv("../output/lsoa_df.csv") %>% 
+df <- read.csv("../output/lsoa_df.csv") 
+
+lsoa_ruralurban <- read.csv("../raw_data/LSOA_Rural_Urban_Classification_2011.csv",stringsAsFactors = F) %>% 
+                        mutate(urban = replace(RUC11CD,RUC11CD %in% c("A1","B1"),"Urban Major"),
+                               urban = replace(urban, urban %in% c("C1","C2"),"Urban Minor"),
+                               urban = replace(urban, urban %in% c("D1","D2","E1","E2"),"Rural"),
+                               urban = factor(urban,ordered = TRUE,levels =  c("Urban Major","Urban Minor","Rural"))) %>% 
+                        dplyr::select(code,urban) #%>% 
+                       # mutate(#urban = replace(urban,urban==TRUE,"Urban"),
+                       #        urban =replace(urban,urban==FALSE,"Rural"))
+
+                        
+df <-  merge(df,lsoa_ruralurban) %>% 
   
         mutate(run_rate = run_count/total_pop,
                imd_dec = cut(x = imd,
-                               breaks = quantile(imd,seq(0,1,0.1)),
-         ordered_result = T,
-         labels = F),
-         bme_dec= cut(x = perc_bme,
-                      breaks = quantile(perc_bme,seq(0,1,0.1)),
-                              ordered_result = T,
-                              labels = F))%>%
+                             breaks = seq(0,100,10),        #  quantile(imd,seq(0,1,0.1)),
+                             ordered_result = T,
+                             labels = F)*10,
+               bme_dec= cut(x = perc_bme,
+                            breaks = seq(0,1,0.1),                  # quantile(perc_bme,seq(0,1,0.1)),
+                            ordered_result = T,
+                            labels = F)*10)%>%
                  
-        melt(id.vars = c("code","imd_dec","bme_dec","pop_density"),
+        melt(id.vars = c("code","imd_dec","bme_dec","urban"),
              measure.vars ="run_rate", 
              value.name = "run_rate") %>%
   
-        dplyr::select(imd_dec,bme_dec,run_rate,pop_density)
+        dplyr::select(imd_dec,bme_dec,run_rate,urban)
 
-# df$pop_density_bins = cut(df$pop_density,
-#                           quantile(df$pop_density,
-#                                    probs = c(0,0.25,0.5,0.75,1)),
-#                           include.lowest = T,
-#                           labels = c("Lowest density","low density","high density","highest density"))
+ #df$pop_density_bins = cut(df$pop_density,
+ #                          quantile(df$pop_density,
+ #                                   probs = c(0,0.5,1)),   # c(0,0.25,0.5,0.75,1)
+ #                          include.lowest = T,
+ #                          labels = c("Low density","High density")) # c("Lowest density","Low density","High density","Highest density")
 
-df <- aggregate(run_rate ~ bme_dec + imd_dec, # + pop_density_bins, 
+df <- aggregate(run_rate ~ bme_dec + imd_dec + urban, #+ #pop_density_bins, 
                 data = df, 
                 FUN= "mean")
 
@@ -296,8 +309,11 @@ ggplot(data = df,
        aes(as.factor(bme_dec), as.factor(imd_dec), fill= run_rate)) + 
   geom_tile()+
   scale_fill_viridis(discrete=FALSE) +
-  xlab("% Ethnic minorities (percentiles)")+
-  ylab("Multiple Deprivation Index (percentiles)") # + facet_wrap(~pop_density_bins,nrow = 2)
+  xlab("Ethnic Density (%)")+
+  ylab("Index of Multiple Deprivation (0-100)")  + 
+  facet_wrap(~urban, nrow = 2) +
+  labs(caption="Source: Office for National Statistics")
+  NULL
 
 # ACCESS
 #
