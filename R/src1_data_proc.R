@@ -50,10 +50,13 @@ lsoa_ethnicity = lsoa_ethnicity[,3:5]
 lsoa_ethnicity = data.frame(code = lsoa_ethnicity$geography.code,
                             perc_bme = 1-lsoa_ethnicity$Sex..All.persons..Age..All.categories..Age..Ethnic.Group..White..Total..measures..Value/lsoa_ethnicity$Sex..All.persons..Age..All.categories..Age..Ethnic.Group..All.categories..Ethnic.group..measures..Value)
 lsoa_ethnicity = lsoa_ethnicity[!(grepl("W",lsoa_ethnicity$code)),]                            
-# density?
+
+# rural urban classification
+lsoa_ruralurban <- read.csv("../raw_data/LSOA_Rural_Urban_Classification_2011.csv",stringsAsFactors = F) %>% mutate(urban = RUC11CD %in% c("A1","B1", "C1","C2"))
+
 
 # merge everything
-lsoa_df = Reduce(function(x, y) merge(x, y,by="code", all=TRUE), list(lsoa_participation,lsoa_distance, lsoa_imd, lsoa_pop,lsoa_density,lsoa_ethnicity))
+lsoa_df = Reduce(function(x, y) merge(x, y,by="code", all=TRUE), list(lsoa_participation,lsoa_distance, lsoa_imd, lsoa_pop,lsoa_density,lsoa_ethnicity,lsoa_ruralurban))
 lsoa_df$run_count[is.na(lsoa_df$run_count)] = 0
 # observation period 1 Jan 2018-10 Dec 2018
 obs_period = 49 # weeks

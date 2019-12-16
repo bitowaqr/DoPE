@@ -100,7 +100,7 @@ We first studied the bivariate Pearson correlations between the dependant variab
 # Results
 
 ## Descriptive Statistics
-Participation in parkrun varies across LSOAs. Around half of all communities (LSOA) average less than 1 finisher per week per 1000 people. Approximately a quarter average between 1 and 2 finishers, and around an eighth between 2 and 3 finishers. There is considerable variation in ethnic density, with most LSOA having a large majority of White-British residents, and few areas having over 50% non-White-British residents. Deprivation is positively skewed, meaning that most areas are not deprived, with a few very deprived areas. Finally, around 70% of LSOAs are within 5km, a parkrun, of a parkrun. Again, this is positively skewed with most LSAO being within 3-4km.
+Participation in parkrun varies across LSOAs. Around half of all communities (LSOA) average less than 1 finisher per week per 1000 people. Approximately a quarter average between 1 and 2 finishers, and around an eighth between 2 and 3 finishers. There is considerable variation in ethnic density, with most LSOA having a large majority of White-British residents, and few areas having over 50% non-White-British residents. Deprivation is positively skewed, meaning that most areas are not deprived, with a few very deprived areas. Finally, around 70% of LSOAs are within 5km, a parkrun, of a parkrun. Again, this is positively skewed with most LSAO being within 3-4km of their nearest event.
 
 ```{r, echo = F,fig.height=5, fig.width=8, fig.cap=paste("Distributions of Participation, IMD Score, Nearest Event and Ethnic Density ")}
 library(reshape2)
