@@ -20,9 +20,9 @@ output:
 
 <br>
 
-  __Keywords__:  `parkrun`, `Participation`, `Physical Activity`, `Deprivation`, `Ethnic density`.  
+  __Keywords__:  `parkrun`, `Physical Activity`, `Deprivation`, `Ethnic density`.  
   
-  __Intended Journal__: Journal of Racial & Ethnic Health Disparities, Sports Medicine Open,Behavioural and Social Sciences, Journal Of Epi & Comm Health.
+  __Intended Journal__: Research in Sport, Exercise and Health, Sports Medicine Open,Leisure Sciences, BMC Public Health.
 
 ****  
 
@@ -71,7 +71,7 @@ Our previous work revealed that there is substantial heterogeneity in parkrun pa
 
 # Methods
 
-Data was obtained from multiple sources at the Lower layer Super Output Level (LSOA). There are 32,844 LSOAs in England, each of which is a geographical area containing around 1,000-3,000 people.
+We undertook an ecological analysis of parkrun participation in England in 2018. Data was obtained from multiple sources at the Lower layer Super Output Level (LSOA). There are 32,844 LSOAs in England, each of which is a geographical area containing around 1,000-3,000 people.
 
 [parkrunUK](https://www.parkrun.org.uk/) provided data on the number of parkrun finishers from each LSOA in England between the 1st January and 10th December 2018, we use the number of finishers as a proxy for parkrun participation, althoough we appreciate that people participate in parkrun in other ways (e.g. volunteering). We also used parkrun event location data, which are publicly available on the parkrunUK [website](https://www.parkrun.org.uk/). 
 
@@ -91,9 +91,9 @@ Table 1. Variables used in the Analysis
 | perc_non_working_age | derived from ONS data on age-groups in each LSOA | [ONS](https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/lowersuperoutputareamidyearpopulationestimates) |
 | run_rate    | derived from run_count and LSAO populations | derived |
 
-After merging these datasets we had detailed data on 32,844 LSOAs, including participation (number of finishers) and several characteristics of the LSOAs which we hypothesised may influence participation. Since previous work [@schneider2019] has found correlations between participation and deprivation, distance to nearest event, and population density we included all these variables. We also extended the analysis to include ethnic density (we use the percentage of the population that reported being non-White-British as a proxy for ethnic density) and the percentage of the population of working age. We are interested in ethnic density as we hypothesised that areas with higher ethnic density would have lower participation rates, all else being equal. We included the percentage of the population that is working age as a control to limit for the effect of populations heavily skewed toward older people (e.g. care homes), or very young people (e.g orphanages/immediately around special needs schools)). Since participation in parkrunUK is dominated by those aged 20-60 @haake2018parkrun we felt this was justified.   
+After merging these datasets we had detailed data on 32,844 LSOAs, including participation (number of finishers) and several characteristics of the LSOAs which we hypothesised may influence participation. Since previous work [@schneider2019] has found correlations between participation and deprivation, distance to nearest event, and population density we included all these variables. We also extended the analysis to include ethnic density (we use the percentage of the population that reported being non-White-British as a proxy for ethnic density) and the percentage of the population of working age. We are interested in ethnic density as we hypothesised that areas with higher ethnic density would have lower participation rates, all else being equal. We included the percentage of the population that is working age as a control to limit for the effect of populations heavily skewed toward older people (e.g. care homes), or young people (e.g near schools). Since participation in parkrunUK is dominated by those aged 20-60 @haake2018parkrun we felt this was justified.   
 
-We first studied the bivariate Pearson correlations between the dependant variable (weekly parkrun participation per 1000 population) and all indepdentant variables described. Results are visually illustrated using the correlation plots [@corrplot2017] and (stratified) heat maps. We then fitted a multivariable regression model to investigate the independent effects of the predictors on parkrun participation. A Poisson distribution with a log-link and with the LSOA total population as an offset variable was used to model parkrun participation as a rate (runners per LSOA population). Model fit was assessed using Pseudo R^2, based on quasi-likelihood functions [@zhang2017rsq]. All analyses were conducted in R [@base_r].
+We first studied the bivariate Pearson correlations between the dependant variable (weekly parkrun participation per 1000 population) and all indepdentant variables described. Results are visually illustrated using the correlation plots [@corrplot2017] and stratified (by rural/urban classification) heat maps. We then fitted a multivariable regression model to investigate the independent effects of the predictors on parkrun participation. A Poisson distribution with a log-link and with the LSOA total population as an offset variable was used to model parkrun participation as a rate (runners per LSOA population). Model fit was assessed using Pseudo R^2, based on quasi-likelihood functions [@zhang2017rsq]. All analyses were conducted in R [@base_r].
 
 \newpage
 
@@ -101,6 +101,9 @@ We first studied the bivariate Pearson correlations between the dependant variab
 
 ## Descriptive Statistics
 Participation in parkrun varies across LSOAs. Around half of all communities (LSOA) average less than 1 finisher per week per 1000 people. Approximately a quarter average between 1 and 2 finishers, and around an eighth between 2 and 3 finishers. There is considerable variation in ethnic density, with most LSOA having a large majority of White-British residents, and few areas having over 50% non-White-British residents. Deprivation is positively skewed, meaning that most areas are not deprived, with a few very deprived areas. Finally, around 70% of LSOAs are within 5km, a parkrun, of a parkrun. Again, this is positively skewed with most LSAO being within 3-4km of their nearest event.
+
+Table 2. Descriptive Statistics
+
 
 ```{r, echo = F,fig.height=5, fig.width=8, fig.cap=paste("Distributions of Participation, IMD Score, Nearest Event and Ethnic Density ")}
 library(reshape2)
@@ -112,7 +115,9 @@ library("viridis")
 library(corrplot)
 library(ggplot2)
 library(fitdistrplus)
- #setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE/Dissemination')
+library(stargazer)
+
+#setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE/Dissemination')
 
 #df <- read.csv("./output/lsoa_df.csv") %>% 
 #        mutate(run_rate = run_count/total_pop * 1000/52)
@@ -123,58 +128,76 @@ df <- read.csv("../output/lsoa_df.csv") %>%
                       total_pop, pop_density,perc_non_working_age) %>% 
               mutate(run_rate = run_count/total_pop * 1000/52)
 
+stargazer(df %>% mutate(perc_non_working_age = perc_non_working_age*100,
+                        perc_bme = perc_bme*100), 
+          type = "text", style = "aer",
+          header = FALSE, 
+          title="", 
+          median = T,
+          digits=1, digits.extra = 2, #initial.zero = FALSE,
+          covariate.labels=c("Number of Finishers",
+                             "IMD Score",
+                             "Ethnic Density (%)",
+                             "Access (km)",
+                             "Population",
+                             "Population Density",
+                             "Non-working age (%)",
+                             "Participation Rate"))
+
+# DESCRIPTIVE STAT PLOTS NOW REMOVED #
+
 # distribution of run rates
-plot_part <- (ggplot(data=df, aes(run_rate)) + 
-  geom_histogram(aes(y =..density..), 
-                 breaks=seq(0, 800/52, by = 1), 
-                 col="darkgreen", 
-                 fill="green", 
-                 alpha = .2) + 
-  #geom_density(col=2) + 
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5))+
-  labs(title="Participation") +
-  labs(x="Weekly finishers per 1000 persons", y = "Density"))
-
-# distribution of imd rates
-plot_imd <- (ggplot(data=df, aes(imd)) + 
-  geom_histogram(aes(y =..density..), 
-                 col="darkgreen", 
-                 fill="green", 
-                 alpha = .2) + 
-  #geom_density(col=2) + 
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5))+
-  labs(title="IMD Score") +
-  labs(x="IMD Score", y = "Density"))
-
-# disetribution of Ethnic Density
-plot_ed <- (ggplot(data=df, aes(perc_bme)) + 
-  geom_histogram(aes(y =..density..),
-                 col="darkgreen", 
-                 fill="green", 
-                 alpha = .2) + 
-  #geom_density(col=2) + 
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5))+
-  labs(title="Ethnic Density") +
-  labs(x="% non-WhiteBritish", y = "Density"))
-
-# distribution of distance to nearest event
-plot_dist <- (ggplot(data=df, aes(mn_dstn)) + 
-  geom_histogram(aes(y =..density..),
-                 col="darkgreen", 
-                 fill="green", 
-                 alpha = .2) + 
-  #geom_density(col=2) + 
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5))+
-  xlim(c(0,40))+
-  labs(title="Nearest event") +
-  labs(x="Distance (km)", y = "Density"))
-
-library(gridExtra)
-grid.arrange(plot_part,plot_imd,plot_dist,plot_ed,ncol=2,nrow=2)
+#plot_part <- (ggplot(data=df, aes(run_rate)) + 
+#  geom_histogram(aes(y =..density..), 
+#                 breaks=seq(0, 800/52, by = 1), 
+#                 col="darkgreen", 
+#                 fill="green", 
+#                 alpha = .2) + 
+#  #geom_density(col=2) + 
+#  theme_minimal() +
+#  theme(plot.title = element_text(hjust = 0.5))+
+#  labs(title="Participation") +
+#  labs(x="Weekly finishers per 1000 persons", y = "Density"))
+#
+## distribution of imd rates
+#plot_imd <- (ggplot(data=df, aes(imd)) + 
+#  geom_histogram(aes(y =..density..), 
+#                 col="darkgreen", 
+#                 fill="green", 
+#                 alpha = .2) + 
+#  #geom_density(col=2) + 
+#  theme_minimal() +
+#  theme(plot.title = element_text(hjust = 0.5))+
+#  labs(title="IMD Score") +
+#  labs(x="IMD Score", y = "Density"))
+#
+## disetribution of Ethnic Density
+#plot_ed <- (ggplot(data=df, aes(perc_bme)) + 
+#  geom_histogram(aes(y =..density..),
+#                 col="darkgreen", 
+#                 fill="green", 
+#                 alpha = .2) + 
+#  #geom_density(col=2) + 
+#  theme_minimal() +
+#  theme(plot.title = element_text(hjust = 0.5))+
+#  labs(title="Ethnic Density") +
+#  labs(x="% non-WhiteBritish", y = "Density"))
+#
+## distribution of distance to nearest event
+#plot_dist <- (ggplot(data=df, aes(mn_dstn)) + 
+#  geom_histogram(aes(y =..density..),
+#                 col="darkgreen", 
+#                 fill="green", 
+#                 alpha = .2) + 
+#  #geom_density(col=2) + 
+#  theme_minimal() +
+#  theme(plot.title = element_text(hjust = 0.5))+
+#  xlim(c(0,40))+
+#  labs(title="Nearest event") +
+#  labs(x="Distance (km)", y = "Density"))
+#
+#library(gridExtra)
+#grid.arrange(plot_part,plot_imd,plot_dist,plot_ed,ncol=2,nrow=2)
 
 ```
 
@@ -441,11 +464,18 @@ partial.r(data = df) %>%
 
 ## Poisson Model
 
-The results of the Poisson regression show that areas with a higher ethnic density have lower participation rates, even when controlling for the effect of deprivation, distance to events, population density and percentage of population working age. The effect is smaller than deprivation and distance, but still material and significant. This confirms the results of our rudimentary, but easily interpretable analysis using colour plots. 
+The results of three Poisson regression models are shown in Table 3 below. All models include the control variables: population density, distance to nearest event and percentage of the population of non-working age. Model 1 includes IMD Score, Model 2 includes Ethnic Density and Model 3 includes both IMD and Ethnic Density. All coefficients are significant at the p<0.01 level. 
+
+Model 1 shows that, controlling for population density, distance to nearest event and age of population, areas with higher IMD (more deprived) have lower participation.
+
+Model 2 shows that, with the same controls, areas with higher ethnic density (% non-White-British) have lower participation. 
+
+Model 3 shows that when both independent variables are included the coefficients decrease, suggesting that some of the effect previously attributed to deprivation is indeed due to lower participation in areas with higher ethnic density. 
+
 
 <!-- NOTE: we could show bivariate regression for each of the variables alone? -->
 
-```{r, echo = FALSE,results='asis'}
+```{r, echo = FALSE,results='asis',fig.width=12}
 #install.packages("stargazer")
 library(stargazer)
 
@@ -456,12 +486,11 @@ df <- read.csv("../output/lsoa_df.csv")
 df$pop_density = log(df$pop_density )  # tranforming pop_density to log scale
 
 #===
-# Model 1: Poisson model imd all as one.
+# Model 1: Poisson model IMD and controls.
 #===
 
 
-model1 = glm(run_count ~ imd + pop_density + mn_dstn 
-                         + perc_non_working_age + perc_bme,
+model1 <- glm(run_count ~ imd  +  pop_density + mn_dstn + perc_non_working_age,
              data = df,
              family = poisson(link="log"),
              offset = log(total_pop))
@@ -470,32 +499,95 @@ model1 = glm(run_count ~ imd + pop_density + mn_dstn
 # stargazer(model1,ci=TRUE, ci.level=0.95)
 
 x = summary(model1)
-r2.1 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
-# r2.1
+r1.1 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
+# r1.1
 
 #===
-# MODEL 2 - SCALED DATA   - allows easier interpretation of beta coefs 
-#===  
+# Model 2: Poisson model Ethnic density and controls.
+#===
 
-# scale the dataframe
-scaled_df <- data.frame(code = df$code,
-                        run_count = df$run_count,
-                        scale(df[,-c(1,2,12)]),
-                        total_pop =df$total_pop,
-                        stringsAsFactors = F)
-
-# model 2
-model2 <- glm(run_count ~ imd + mn_dstn + 
-                perc_non_working_age + pop_density + perc_bme,
-             data = scaled_df,
+model2 <- glm(run_count ~  perc_bme +  pop_density + mn_dstn + perc_non_working_age,
+             data = df,
              family = poisson(link="log"),
              offset = log(total_pop))
 
 # stargazer(model2,ci=TRUE, ci.level=0.95)
 
-x <- summary(model2)
-r2.2 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance) # same fit
-# r2.2
+x = summary(model2)
+r1.2 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
+# r1.2
+
+
+#===
+# Model 3: Poisson model with IMD and Ethnic density and controls
+#===
+
+model3 <-  glm(run_count ~ imd + perc_bme +  pop_density + mn_dstn + perc_non_working_age,
+            data = df,
+            family = poisson(link="log"),
+            offset = log(total_pop))
+
+# stargazer(model3,ci=TRUE, ci.level=0.95)
+
+# x = summary(model3)
+# r1.3 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
+
+#===
+# Model 4: Poisson model with IMD and Ethnic density and interaction + controls
+#===
+
+#model4 <-  glm(run_count ~ imd + perc_bme + (imd * perc_bme) + pop_density + mn_dstn + perc_non_working_age,
+#            data = df,
+#            family = poisson(link="log"),
+#            offset = log(total_pop))
+#
+# stargazer(model3,ci=TRUE, ci.level=0.95)
+
+# x = summary(model3)
+# r1.3 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
+
+
+
+
+# PLOT stargazer plot of models
+stargazer(model1, model2, model3,
+          header = FALSE,
+          column.labels	= c("Model 1","Model 2","Model 3"),
+          ci=FALSE, ci.level=0.95, #font.size= 9, 
+          title="Poisson Log-link GLM Results",header = FALSE,
+          dep.var.labels = "Participation",
+          covariate.labels = c("IMD Score",
+                               "Ethnic-Density",
+                               "Pop Density",
+                               "Distance(km)",
+                               "Non-working-age"))
+        
+
+
+
+#===
+# MODEL 2 - SCALED DATA   - allows easier interpretation of beta coefs 
+#===  
+#
+## scale the dataframe
+#scaled_df <- data.frame(code = df$code,
+#                        run_count = df$run_count,
+#                        scale(df[,-c(1,2,12)]),
+#                        total_pop =df$total_pop,
+#                        stringsAsFactors = F)
+#
+## model 2
+#model2 <- glm(run_count ~ imd + mn_dstn + 
+#                perc_non_working_age + pop_density + perc_bme,
+#             data = scaled_df,
+#             family = poisson(link="log"),
+#             offset = log(total_pop))
+#
+## stargazer(model2,ci=TRUE, ci.level=0.95)
+#
+#x <- summary(model2)
+#r2.2 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance) # same fit
+## r2.2
 
 #===
 # MODEL 3
@@ -509,29 +601,26 @@ r2.2 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance) # same fit
 #summary(model3)
 
 # x = summary(model3)
-# r2.3 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
-  
+#r2.3 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
+#
 
-#===
-# MODEL 4 - JUST IMD IMD, DISTANCE AND %BME
-#===
-model4 <- glm(run_count ~ imd + mn_dstn + perc_bme,
-             data = scaled_df,
-             family = poisson(link="log"),
-             offset = log(total_pop))
-
-# summary(model4)
-
-x = summary(model4)
-r2.4 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
-
-
-##### summary
-stargazer(
-  model1,model4,model2,
-  column.labels	= c("Original scale","Scaled - min model","Scaled - full model"),
-  ci=TRUE, ci.level=0.95,
-  title="Regression Results",header = FALSE)
+#  
+#
+##===
+## MODEL 4 - JUST IMD IMD, DISTANCE AND %BME
+##===
+#model4 <- glm(run_count ~ imd + mn_dstn + perc_bme,
+#             data = scaled_df,
+#             family = poisson(link="log"),
+#             offset = log(total_pop))
+#
+## summary(model4)
+#
+#x = summary(model4)
+#r2.4 = 1-((x$deviance-length(coef(x)[,1]))/x$null.deviance)
+#
+#
+###### summary
 
 
 
@@ -555,9 +644,9 @@ stargazer(
     
 # Discussion
 
-Our findings show that areas with higher ethnic density have lower participation rates. This effect persists after controlling for other area characteristics such as deprivation, access to events and population density. While our previous analysis [Scheider et al., 2019](https://www.medrxiv.org/content/early/2019/08/29/19004143.full.pdf) has shown that participation in parkrun is lower in more deprived communitiesthe present results suggest that some of the negative effect on participation previously attributed to deprivation can actually be attributed to differences in participation by area ethnic density. 
+Our findings show that more deprived areas and areas with higher ethnic density have lower participation rates. This effect persists after controlling for other area characteristics such as deprivation, access to events and population density. While our previous analysis [Scheider et al., 2019](https://www.medrxiv.org/content/early/2019/08/29/19004143.full.pdf) has shown that participation in parkrun is lower in more deprived communitiesthe present results suggest that a small part of the negative effect on participation previously attributed to deprivation can actually be attributed to differences in participation by area ethnic density. 
 
-parkrun's visition of creating a "healthier and happier planet by continually breaking down barriers to participation and bringing people together from all walks of life whenever they want to come along" (p.5) @cutforth2017so has huge potential in improving population physical activity and therefore public health. Our findings indicate that participation in deprived communities with high ethnic density was particularly low in 2018. Understanding the reasons for these differences in participation is a crucial first step in breaking down barriers, and replicating these methods in several years may give parkrun the ability to monitor trends in participation from different groups in society and allowing parkrun to monitor the effectiveness of their efforts to reach minority communities. 
+parkrun's visition of creating a "healthier and happier planet by continually breaking down barriers to participation and bringing people together from all walks of life whenever they want to come along" (p.5) @cutforth2017so has potential to improve population physical activity and therefore public health. Our findings indicate that participation in deprived communities with high ethnic density was particularly low. Understanding the reasons for these differences in participation is a crucial first step in breaking down barriers. Replicating this study in several years may give parkrun the ability to monitor trends in participation from different groups in society, and therefore the effectiveness of efforts to reach minority communities and those living in deprived areas. 
 
 
 # Limitations
