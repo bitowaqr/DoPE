@@ -9,7 +9,7 @@ output:
 
 # Does ethnic density influence community participation in mass participation physical activity events?: a case of parkrun
 
-*Smith R^1^,Schneider PP^1^, Bullas A^2^, Bayley  T^1^, Haake SSJ^2^, Brennan A^1^, Goyder E^1^*
+*Smith R^1^, Schneider PP^1^, Bullas A^2^, Haake SSJ^2^, Goyder E^1^*
 
 <br>
 
@@ -105,7 +105,7 @@ Participation in parkrun varies across LSOAs. Around half of all communities (LS
 Table 2. Descriptive Statistics
 
 
-```{r, echo = F,fig.height=5, fig.width=8, fig.cap=paste("Distributions of Participation, IMD Score, Nearest Event and Ethnic Density ")}
+```{r, echo = F,fig.height=5,results = 'asis', fig.width=8, fig.cap=paste("Distributions of Participation, IMD Score, Nearest Event and Ethnic Density ")}
 library(reshape2)
 library(dplyr)
 library(tidyverse)
@@ -117,7 +117,7 @@ library(ggplot2)
 library(fitdistrplus)
 library(stargazer)
 
-#setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE/Dissemination')
+setwd('C:/Users/Robert/Google Drive/Other Projects/PARKRUN/DoPE/Dissemination')
 
 #df <- read.csv("./output/lsoa_df.csv") %>% 
 #        mutate(run_rate = run_count/total_pop * 1000/52)
@@ -130,18 +130,18 @@ df <- read.csv("../output/lsoa_df.csv") %>%
 
 stargazer(df %>% mutate(perc_non_working_age = perc_non_working_age*100,
                         perc_bme = perc_bme*100), 
-          type = "text", style = "aer",
+          type = "latex", style = "aer",
           header = FALSE, 
           title="", 
           median = T,
           digits=1, digits.extra = 2, #initial.zero = FALSE,
           covariate.labels=c("Number of Finishers",
                              "IMD Score",
-                             "Ethnic Density (%)",
+                             "Ethnic Density",
                              "Access (km)",
                              "Population",
                              "Population Density",
-                             "Non-working age (%)",
+                             "Non-working age",
                              "Participation Rate"))
 
 # DESCRIPTIVE STAT PLOTS NOW REMOVED #
@@ -310,7 +310,7 @@ lsoa_ruralurban <- read.csv("../raw_data/LSOA_Rural_Urban_Classification_2011.cs
                         
 df <-  merge(df,lsoa_ruralurban) %>% 
   
-        mutate(run_rate = run_count/total_pop,
+        mutate(run_rate = run_count/total_pop/52*1000,
                imd_dec = cut(x = imd,
                              breaks = seq(0,100,10),        #  quantile(imd,seq(0,1,0.1)),
                              ordered_result = T,
@@ -336,7 +336,7 @@ df <- aggregate(run_rate ~ bme_dec + imd_dec + urban, #+ #pop_density_bins,
                 data = df, 
                 FUN= "mean")
 
-ggplot(data = df,
+plot1 <- (ggplot(data = df,
        aes(as.factor(bme_dec), as.factor(imd_dec), fill= run_rate)) + 
   geom_tile()+
   theme_classic()+
@@ -350,8 +350,12 @@ ggplot(data = df,
         axis.text.y = element_text(vjust = -2),
         axis.ticks.x = element_blank(),
         axis.ticks.y = element_blank())+
-  annotate("text", x=8.5,y=9.5, label = "Most Deprived & \n Highest Ethnic Density", color = "black", size = 2, fontface = "bold") 
+  annotate("text", x=8.5,y=9.5, label = "Most Deprived & \n Highest Ethnic Density", color = "black", size = 2, fontface = "bold")) 
   #NULL
+
+plot1
+
+ggsave(filename = "../output/colour_plot.png",plot = plot1,device = "png")
 
 ```
 
@@ -412,6 +416,7 @@ ggplot(data = df,
   ylab("Index of Multiple Deprivation (0-100)")  + 
   facet_wrap(~mn_dstn, nrow = 2) +
   labs(caption="Source: Office for National Statistics")
+
 #NULL
 
 ```
@@ -554,7 +559,7 @@ stargazer(model1, model2, model3,
           header = FALSE,
           column.labels	= c("Model 1","Model 2","Model 3"),
           ci=FALSE, ci.level=0.95, #font.size= 9, 
-          title="Poisson Log-link GLM Results",header = FALSE,
+          title="Poisson Log-link GLM Results",
           dep.var.labels = "Participation",
           covariate.labels = c("IMD Score",
                                "Ethnic-Density",
@@ -644,20 +649,17 @@ stargazer(model1, model2, model3,
     
 # Discussion
 
-Our findings show that more deprived areas and areas with higher ethnic density have lower participation rates. This effect persists after controlling for other area characteristics such as deprivation, access to events and population density. While our previous analysis [Scheider et al., 2019](https://www.medrxiv.org/content/early/2019/08/29/19004143.full.pdf) has shown that participation in parkrun is lower in more deprived communitiesthe present results suggest that a small part of the negative effect on participation previously attributed to deprivation can actually be attributed to differences in participation by area ethnic density. 
+Our findings show that more deprived areas and areas with higher ethnic density have lower participation rates. This effect persists after controlling for other area characteristics such as deprivation, access to events and population density. While our previous analysis [@schneider2019] showed that participation in parkrun is lower in more deprived communities the present results suggest that a small part of the negative effect on participation previously attributed to deprivation can actually be attributed to ethnic density. 
 
-parkrun's visition of creating a "healthier and happier planet by continually breaking down barriers to participation and bringing people together from all walks of life whenever they want to come along" (p.5) @cutforth2017so has potential to improve population physical activity and therefore public health. Our findings indicate that participation in deprived communities with high ethnic density was particularly low. Understanding the reasons for these differences in participation is a crucial first step in breaking down barriers. Replicating this study in several years may give parkrun the ability to monitor trends in participation from different groups in society, and therefore the effectiveness of efforts to reach minority communities and those living in deprived areas. 
-
+parkrun's vision of creating a "healthier and happier planet by continually breaking down barriers to participation and bringing people together from all walks of life whenever they want to come along" (p.5) @cutforth2017so has potential to improve population physical activity and therefore public health. Understanding the determinants of participation at the community level is a useful first step, but qualitative work to understand why this is the case is an obvious next step. Replicating this study in several years will enable parkrun to monitor trends in participation from different groups in society, and therefore the effectiveness of efforts to reach minority communities and those living in deprived areas.
 
 # Limitations
 
 This analysis is ecological and therefore it is not possible to make conclusions at an individual level without risking an ecological inference fallacy. We have been careful throught to make conclusions at the level of the LSOA, rather than te individual. Nevertheless, given that the evidence at the individual level points to lower participation in organised sport by those from ethnic minority backgrounds (insert REF), we think it is likely that the same effect exists at the individual level.
 
-Our dependent variable is the number of finishers by residents of each LSOA. This is a count variable where each walk or run finished is treated equally (e.g. 10 finishes by one person is equal to 10 people completing one event). We cannot draw inferences on the number of people who took part within each LSOA at some point in the year, but instead focus on the total finisher count.
+Our dependent variable is the number of finishers by residents of each LSOA. This is a count variable where each walk or run finished is treated equally (e.g. 10 finishes by one person is equal to 10 people completing one event). We cannot draw inferences on the number of people who took part within each LSOA at some point in the year, but instead focus on the total finisher count. We do not expect that this will affect the core finding of the paper. 
 
-We use percent non-White-British as a crude proxy for ethnic density, and do not estimate participation by ethnic groups seperately. It is possible that there are significant differences between participation rates of different minority ethnic groups. Future analysis could look into which groups are most/least engaged in order to target efforts most efficiently.  
-
-We controlled for several variables which we thought would influence participation, it is possible that there are other confounding factors which have not been included.
+We use percent non-White-British as a crude proxy for ethnic density, and do not estimate participation by ethnic groups seperately. It is possible that there are significant differences between participation rates of different minority ethnic groups. Future analysis could look into which groups are most/least engaged in order to target efforts most efficiently. Furthermore we controlled for several variables which we thought would influence participation, it is possible that there are other confounding factors which have not been included.
 
 # Conclusion
 
