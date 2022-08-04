@@ -1,5 +1,4 @@
-# DoPE
+# THIS REPO IS DEPRECATED
 
-Determinants of parkrun engagement
-
-Trying to better understand the determinants of parkrun participation. Our previous model used deprivation and distance
+# PLEASE GO TO:
+## [https://github.com/ScHARR-PHEDS/DoPE_Public](https://github.com/ScHARR-PHEDS/DoPE_Public)
